@@ -7,35 +7,29 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import org.json.JSONException;
 
 import java.io.File;
 import java.util.ArrayList;
 
-import ar.com.hjg.pngj.IImageLine;
 import ar.com.hjg.pngj.PngReader;
-import ar.com.hjg.pngj.PngWriter;
-import ar.com.hjg.pngj.chunks.ChunkCopyBehaviour;
-import ar.com.hjg.pngj.chunks.PngChunkTEXT;
-import ar.com.hjg.pngj.chunks.PngChunkTextVar;
 import ru.jaromirchernyavsky.youniverse.Card;
-import ru.jaromirchernyavsky.youniverse.MainAdapter;
 import ru.jaromirchernyavsky.youniverse.R;
-import ru.jaromirchernyavsky.youniverse.databinding.FragmentCardBinding;
+import ru.jaromirchernyavsky.youniverse.RecyclerAdapter;
 import ru.jaromirchernyavsky.youniverse.databinding.FragmentHomeBinding;
 
 public class HomeFragment extends Fragment {
     private ArrayList<Card> cards = new ArrayList<Card>();
     private FragmentHomeBinding binding;
     GridView gridView;
+    RecyclerView recyclerView;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
@@ -45,7 +39,7 @@ public class HomeFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        gridView = getView().findViewById(R.id.gridView);
+        recyclerView = getView().findViewById(R.id.recycle);
         try {
             readCards(getContext());
         } catch (JSONException e) {
@@ -72,7 +66,8 @@ public class HomeFragment extends Fragment {
         }
     }
     private void showCards(Context context){
-        MainAdapter adapter = new MainAdapter(context,cards);
-        gridView.setAdapter(adapter);
+        RecyclerAdapter adapter = new RecyclerAdapter(cards);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
     }
 }
