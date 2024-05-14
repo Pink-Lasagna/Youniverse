@@ -2,11 +2,9 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    tools:context=".CardFragment">
-
+    android:layout_height="wrap_content">
     <com.google.android.material.card.MaterialCardView
-        android:layout_width="165dp"
+        android:layout_width="180dp"
         android:id="@+id/card"
         android:layout_height="wrap_content"
         style="?attr/materialCardViewElevatedStyle"
@@ -16,7 +14,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
             <TextView
                 android:id="@+id/name"
                 android:padding="10dp"
@@ -29,17 +26,15 @@
             <ImageView
                 android:id="@+id/image"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="110dp"
                 android:src="@drawable/ic_launcher_background"
                 android:scaleType="centerCrop"
                 />
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="12dp">
-
                 <TextView
                     android:id="@+id/description"
                     android:layout_width="wrap_content"
@@ -48,13 +43,7 @@
                     android:textAppearance="?attr/textAppearanceBodyMedium"
                     android:textColor="?android:attr/textColorSecondary"
                     />
-
             </LinearLayout>
-
         </LinearLayout>
-
-
-
     </com.google.android.material.card.MaterialCardView>
-
 </FrameLayout>
