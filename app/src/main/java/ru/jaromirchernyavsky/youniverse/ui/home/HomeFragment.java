@@ -1,6 +1,8 @@
 package ru.jaromirchernyavsky.youniverse.ui.home;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Picture;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -17,6 +19,8 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import org.json.JSONException;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 
 import ar.com.hjg.pngj.PngReader;
@@ -56,10 +60,26 @@ public class HomeFragment extends Fragment {
     }
     private void readCards(Context context) throws JSONException {
         File myDir = new File(context.getFilesDir() + "/saved_images");
-        File[] files = myDir.listFiles();
-        for (File file : files) {
+        if (!myDir.exists()) {
+            boolean success = myDir.mkdirs();
+        }
+        try{
+            myDir.listFiles();
+        } catch (Exception e){
+                File file = new File (myDir, "example.png");
+                try {
+                    FileOutputStream out = new FileOutputStream(file);
+                    out.write(Files.readAllBytes(new File("ru/jaromirchernyavsky/youniverse/cards/example.png").toPath()));
+                    out.flush();
+                    out.close();
+                } catch (Exception ee) {
+                    ee.printStackTrace();
+                }
+        }
+        for (File file : myDir.listFiles()) {
             PngReader pngr = new PngReader(file);
             String data = pngr.getMetadata().getTxtForKey("chara");
+            if(data.isEmpty()) continue;
             Uri uri = Uri.fromFile(file);
             cards.add(new Card(data,uri));
             pngr.close();

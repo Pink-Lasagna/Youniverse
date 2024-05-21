@@ -147,11 +147,7 @@ public class CreateCard extends AppCompatActivity {
         String base64 = Base64.encodeToString(metadata.getBytes(),Base64.CRLF);
         Random rand = new Random();
         String fname = "Image-"+ rand.nextInt(999999999);
-        System.out.println(fname);
         File myDir = new File(context.getFilesDir() + "/saved_images");
-        if (!myDir.exists()) {
-            boolean success = myDir.mkdirs();
-        }
         File file = new File (myDir, fname+".png");
         try {
             FileOutputStream out = new FileOutputStream(file);
