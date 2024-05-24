@@ -90,7 +90,9 @@ public class ChatActivity extends AppCompatActivity {
             throw new RuntimeException(e);
         }
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);
+
         messageAdapter = new MessageAdapter(messages);
         recyclerView.setAdapter(messageAdapter);
         nametv.setText(name);
