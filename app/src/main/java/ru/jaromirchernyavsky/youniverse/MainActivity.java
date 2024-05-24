@@ -9,6 +9,7 @@ import android.util.Base64;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -27,6 +28,7 @@ import ar.com.hjg.pngj.chunks.PngChunkTEXT;
 import ar.com.hjg.pngj.chunks.PngChunkTextVar;
 import ru.jaromirchernyavsky.youniverse.databinding.ActivityMainBinding;
 import ru.jaromirchernyavsky.youniverse.ui.dashboard.DashboardFragment;
+import ru.jaromirchernyavsky.youniverse.ui.home.HomeFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -53,5 +55,4 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupWithNavController(binding.navView, navController);
     }
-
 }

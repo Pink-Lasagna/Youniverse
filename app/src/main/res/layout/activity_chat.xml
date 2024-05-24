@@ -13,7 +13,9 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@+id/frameLayout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintVertical_bias="1.0" />
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -59,29 +61,30 @@
 
     </LinearLayout>
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
+        android:layout_margin="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:background="@drawable/background_message"
+        app:layout_constraintStart_toStartOf="parent"
+        android:orientation="horizontal">
 
         <EditText
             android:id="@+id/edit"
             style="@style/Widget.Material3.TextInputEditText.OutlinedBox"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:background="@drawable/background_message"
-            android:breakStrategy="simple"
             android:ems="10"
             android:hint="Напиши"
-            android:hyphenationFrequency="none"
             android:imeOptions="actionSend"
-            android:inputType="text"
-            android:outlineProvider="background" />
+            android:inputType="textMultiLine"
+            android:outlineProvider="background"
+            android:singleLine="false" />
 
         <ImageButton
             android:id="@+id/send"
@@ -94,6 +97,6 @@
             android:minWidth="45dp"
             android:minHeight="45dp"
             android:src="@drawable/baseline_4g_mobiledata_24" />
-    </FrameLayout>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

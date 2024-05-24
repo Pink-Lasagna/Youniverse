@@ -9,7 +9,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.RemoteController;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -24,6 +27,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.github.leandroborgesferreira.loadingbutton.customViews.CircularProgressButton;
+import com.github.leandroborgesferreira.loadingbutton.customViews.ProgressButton;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.apache.commons.imaging.formats.png.chunks.PngChunk;
@@ -34,6 +39,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import ar.com.hjg.pngj.IImageLine;
 import ar.com.hjg.pngj.PngReader;
@@ -52,6 +59,7 @@ public class CreateCard extends AppCompatActivity {
             new ActivityResultCallback<ActivityResult>() {
                 @Override
                 public void onActivityResult(ActivityResult result) {
+                    Log.i("gs",result.toString());
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         // There are no request codes
                         Intent data = result.getData();
@@ -104,10 +112,11 @@ public class CreateCard extends AppCompatActivity {
             name.setHint("Имя");
             characterGroup.setVisibility(View.VISIBLE);
         });
-        findViewById(R.id.CreateButton).setOnClickListener(v -> {
+        CircularProgressButton btn = findViewById(R.id.CreateButton);
+        btn.setOnClickListener(v -> {
+            btn.startAnimation();
             String result = "{\"data\":{\"alternate_greetings\": [], \"avatar\": \"none\",\"character_version\":\"main\",\"creator\": \""+username+"\",\"creator_notes\": \"\",\"description\": \""+summary.getEditText().getText()+"\",\"first_mes\": \""+first_message.getEditText().getText()+"\",\"mes_example\": \""+example.getEditText().getText()+"\",\"name\": \""+name.getEditText().getText()+"\",\"post_history_instructions\": \"\",\"scenario\": \""+scenario.getEditText().getText()+"\",\"system_prompt\": \"\",\"tags\": []},\"spec\": \"chara_card_v2\",\"spec_version\": \"2.0\"}";
-            saveCard(this,getContactBitmapFromURI(this,imageuri), result);
-            this.finish();
+            saveCard(this,getContactBitmapFromURI(this,imageuri), result, btn);
         });
     }
 
@@ -143,36 +152,43 @@ public class CreateCard extends AppCompatActivity {
         }
         return null;
     }
-    private static void saveCard(Context context, Bitmap finalBitmap, String metadata){
-        String base64 = Base64.encodeToString(metadata.getBytes(),Base64.CRLF);
-        Random rand = new Random();
-        String fname = "Image-"+ rand.nextInt(999999999);
-        File myDir = new File(context.getFilesDir() + "/saved_images");
-        File file = new File (myDir, fname+".png");
-        try {
-            FileOutputStream out = new FileOutputStream(file);
-            finalBitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
-            out.flush();
-            out.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        File destFile = new File (myDir, fname+"1.png");
-        PngReader pngr = new PngReader(file);
-        PngWriter pngw = new PngWriter(destFile, pngr.imgInfo, true);
-        PngChunkTextVar pngctv = new PngChunkTEXT(pngr.imgInfo);
-        pngctv.setKeyVal("chara",base64);
-        pngctv.setPriority(true);
-        pngw.getMetadata().queueChunk(pngctv);
-        System.out.println(pngr.getMetadata().getTxtForKey("chara"));
-        pngw.copyChunksFrom(pngr.getChunksList(), ChunkCopyBehaviour.COPY_ALL);
-        for (int row = 0; row < pngr.imgInfo.rows; row++) {
-            IImageLine l1 = pngr.readRow();
-            pngw.writeRow(l1);
-        }
-        pngr.end();
-        pngw.end();
-        boolean deleted = file.delete();
+    private static void saveCard(Activity context, Bitmap finalBitmap, String metadata, CircularProgressButton btn){
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+
+            String base64 = Base64.encodeToString(metadata.getBytes(), Base64.CRLF);
+            Random rand = new Random();
+            String fname = "Image-" + rand.nextInt(999999999);
+            File myDir = new File(context.getFilesDir() + "/saved_images");
+            File file = new File(myDir, fname + ".png");
+            try {
+                FileOutputStream out = new FileOutputStream(file);
+                finalBitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
+                out.flush();
+                out.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            File destFile = new File(myDir, fname + "1.png");
+            PngReader pngr = new PngReader(file);
+            PngWriter pngw = new PngWriter(destFile, pngr.imgInfo, true);
+            PngChunkTextVar pngctv = new PngChunkTEXT(pngr.imgInfo);
+            pngctv.setKeyVal("chara", base64);
+            pngctv.setPriority(true);
+            pngw.getMetadata().queueChunk(pngctv);
+            System.out.println(pngr.getMetadata().getTxtForKey("chara"));
+            pngw.copyChunksFrom(pngr.getChunksList(), ChunkCopyBehaviour.COPY_ALL);
+            for (int row = 0; row < pngr.imgInfo.rows; row++) {
+                IImageLine l1 = pngr.readRow();
+//                btn.setProgress(row / 100f);
+                pngw.writeRow(l1);
+            }
+            pngr.end();
+            pngw.end();
+            file.delete();
+            context.finish();
+        });
+
     }
 
 }

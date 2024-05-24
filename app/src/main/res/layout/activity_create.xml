@@ -61,11 +61,11 @@
                     android:layout_width="150dp"
                     android:layout_height="wrap_content"
                     android:maxWidth="150dp"
+                    android:maxHeight="150dp"
                     android:minWidth="150dp"
                     android:minHeight="150dp"
-                    android:maxHeight="150dp"
                     android:src="@android:drawable/title_bar_tall"
-                    app:srcCompat="@android:drawable/title_bar_tall" />
+                    app:srcCompat="@drawable/ic_lmao" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/name"
@@ -154,13 +154,17 @@
 
             </LinearLayout>
 
-            <Button
+            <com.github.leandroborgesferreira.loadingbutton.customViews.CircularProgressButton
                 android:id="@+id/CreateButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:text="Создать"
-                app:cornerRadius="10dp" />
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/purple_200"
+                app:spinning_bar_padding="6dp"
+                app:spinning_bar_width="4dp" />
         </LinearLayout>
     </ScrollView>
 

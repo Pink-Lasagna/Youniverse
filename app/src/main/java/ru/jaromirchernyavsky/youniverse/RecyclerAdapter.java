@@ -2,6 +2,8 @@ package ru.jaromirchernyavsky.youniverse;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +14,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
@@ -47,7 +50,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     }
 
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener{
         public ImageView imageView;
         public TextView name;
         public TextView description;
@@ -57,6 +60,19 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             imageView = itemView.findViewById(R.id.image);
             name = itemView.findViewById(R.id.name);
             description = itemView.findViewById(R.id.description);
+            itemView.setOnCreateContextMenuListener(this);
         }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            menu.add(this.getAdapterPosition(),0,0,"Скачать в галерею");
+            menu.add(this.getAdapterPosition(),1,1,"Удалить");
+        }
+    }
+
+    public void deleteCard(int pos) {
+        new File(cards.get(pos).uri.toString()).delete();
+        cards.remove(pos);
+        notifyItemRemoved(pos);
     }
 }

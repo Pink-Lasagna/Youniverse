@@ -6,6 +6,7 @@ import android.graphics.Picture;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
@@ -30,10 +31,11 @@ import ru.jaromirchernyavsky.youniverse.RecyclerAdapter;
 import ru.jaromirchernyavsky.youniverse.databinding.FragmentHomeBinding;
 
 public class HomeFragment extends Fragment {
-    private ArrayList<Card> cards = new ArrayList<Card>();
+    public ArrayList<Card> cards = new ArrayList<>();
     private FragmentHomeBinding binding;
     GridView gridView;
     RecyclerView recyclerView;
+    RecyclerAdapter adapter;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
@@ -44,21 +46,26 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         recyclerView = getView().findViewById(R.id.recycle);
+        adapter = new RecyclerAdapter(cards);
+    }
+
+    @Override
+    public void onResume() {
         try {
             readCards(getContext());
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-        showCards(getContext());
+        super.onResume();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        cards.clear();
         binding = null;
     }
-    private void readCards(Context context) throws JSONException {
+    public void readCards(Context context) throws JSONException {
+        cards.clear();
         File myDir = new File(context.getFilesDir() + "/saved_images");
         if (!myDir.exists()) {
             boolean success = myDir.mkdirs();
@@ -84,10 +91,19 @@ public class HomeFragment extends Fragment {
             cards.add(new Card(data,uri));
             pngr.close();
         }
-    }
-    private void showCards(Context context){
-        RecyclerAdapter adapter = new RecyclerAdapter(cards);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        switch (item.getOrder()){
+            case 0:
+                break;
+            case 1:
+                adapter.deleteCard(item.getGroupId());
+                break;
+        }
+        return true;
     }
 }

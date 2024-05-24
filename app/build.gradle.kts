@@ -1,3 +1,6 @@
+import com.android.build.gradle.internal.tasks.R8Task
+import com.android.ide.common.resources.MergedResourceWriter
+
 plugins {
     id("com.android.application")
 }
@@ -18,8 +21,8 @@ android {
 
     buildTypes {
         release {
-
             isMinifyEnabled = false
+            isCrunchPngs = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -33,12 +36,14 @@ android {
 }
 dependencies {
     implementation("commons-io:commons-io:2.16.1")
-    implementation("com.theokanning.openai-gpt3-java:service:0.18.2")
+    // https://mvnrepository.com/artifact/com.google.code.gson/gson
+    implementation("com.google.code.gson:gson:2.11.0")
     implementation("org.apache.commons:commons-imaging:1.0.0-alpha5")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.yanzhenjie.recyclerview:x:1.3.2")
     implementation("ar.com.hjg:pngj:2.1.0")
     implementation("com.google.android.material:material:1.12.0")
+    implementation("com.github.leandroborgesferreira:loading-button-android:2.3.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
