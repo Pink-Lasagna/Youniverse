@@ -84,6 +84,7 @@ public class HomeFragment extends Fragment {
                 }
         }
         for (File file : myDir.listFiles()) {
+            System.out.println(file.getAbsolutePath());
             PngReader pngr = new PngReader(file);
             String data = pngr.getMetadata().getTxtForKey("chara");
             if(data.isEmpty()) continue;

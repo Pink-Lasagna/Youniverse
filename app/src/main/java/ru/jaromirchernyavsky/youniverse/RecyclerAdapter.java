@@ -71,7 +71,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     }
 
     public void deleteCard(int pos) {
-        new File(cards.get(pos).uri.toString()).delete();
+        new File(cards.get(pos).uri.toString().substring(8)).delete();
         cards.remove(pos);
         notifyItemRemoved(pos);
     }

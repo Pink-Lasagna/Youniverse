@@ -58,6 +58,7 @@ public class ChatActivity extends AppCompatActivity {
     EditText editTxt;
     String firstMessage;
     String scenario;
+    RecyclerView recyclerView;
     String sys_prompt;
     String exampleMessages;
     String userPersona;
@@ -68,7 +69,7 @@ public class ChatActivity extends AppCompatActivity {
         TextView nametv = findViewById(R.id.name);
         ImageView imageView = findViewById(R.id.pfp);
         editTxt = findViewById(R.id.edit);
-        RecyclerView recyclerView = findViewById(R.id.recycler);
+        recyclerView = findViewById(R.id.recycler);
 
         try {
             data = new JSONObject(getIntent().getStringExtra("data"));
@@ -92,7 +93,6 @@ public class ChatActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);
-
         messageAdapter = new MessageAdapter(messages);
         recyclerView.setAdapter(messageAdapter);
         nametv.setText(name);
@@ -116,6 +116,7 @@ public class ChatActivity extends AppCompatActivity {
         messageAdapter.notifyItemInserted(messages.size());
         editTxt.setText("");
         generateMessage();
+        recyclerView.smoothScrollToPosition(messages.size());
     }
 
     private void generateMessage(){

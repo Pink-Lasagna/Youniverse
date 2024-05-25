@@ -23,8 +23,5 @@ public class Card {
         convertedData = new JSONObject(new JSONObject(new String(Base64.decode(data, Base64.DEFAULT))).getString("data"));
         name = convertedData.getString("name");
         description = convertedData.getString("description");
-        if(description.length()>110){
-            description = description.substring(0,110) + "...";
-        }
     }
 }
