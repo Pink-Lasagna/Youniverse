@@ -6,17 +6,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.util.Base64;
-import android.util.Log;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,44 +18,38 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.time.Duration;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ChatActivity extends AppCompatActivity {
     ArrayList<ChatMessage> messages = new ArrayList<>();
+    private static final int PERMISSION_CODE = 1001;
+    String TAG;
     MessageAdapter messageAdapter;
     String name;
     Uri pfp;
     JSONObject data;
-    private static final int PERMISSION_CODE = 1001;
+
     String description;
-    String TAG;
     EditText editTxt;
     String firstMessage;
     String scenario;
-    RecyclerView recyclerView;
-    String sys_prompt;
     String exampleMessages;
     String userPersona;
+    RecyclerView recyclerView;
+    String sys_prompt;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,27 +57,23 @@ public class ChatActivity extends AppCompatActivity {
         TextView nametv = findViewById(R.id.name);
         ImageView imageView = findViewById(R.id.pfp);
         editTxt = findViewById(R.id.edit);
-        recyclerView = findViewById(R.id.recycler);
+        recyclerView = findViewById(R.id.cards);
 
         try {
             data = new JSONObject(getIntent().getStringExtra("data"));
             description = data.getString("description");
             firstMessage = data.getString("first_mes");
             scenario = data.getString("scenario");
+            name = getIntent().getStringExtra("name");
+            pfp = getIntent().getParcelableExtra("uri");
             exampleMessages = data.getString("mes_example");
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-        name = getIntent().getStringExtra("name");
-        pfp = getIntent().getParcelableExtra("uri");
         TAG = pfp.toString().substring(pfp.toString().lastIndexOf("/")+1);
         userPersona = getIntent().getStringExtra("userPersona");
         sys_prompt = system_message(description,scenario,exampleMessages,userPersona);
-        try {
-            messages = getStoredMessages()==null?messages:getStoredMessages();
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
+        messages = getStoredMessages()==null?messages:getStoredMessages();
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);
@@ -186,11 +170,7 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        try {
-            storeMessages();
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
+        storeMessages();
     }
 
     private String system_message(String description, String scenario, String exampleMessages, String userPersona){
@@ -219,7 +199,7 @@ public class ChatActivity extends AppCompatActivity {
         return result;
     }
 
-    private void storeMessages() throws JSONException {
+    private void storeMessages() {
         Gson gson = new Gson();
 
         SharedPreferences sharedPreferences = getSharedPreferences(TAG, 0);
@@ -229,7 +209,7 @@ public class ChatActivity extends AppCompatActivity {
         edit.apply();
     }
 
-    private ArrayList<ChatMessage> getStoredMessages() throws JSONException {
+    private ArrayList<ChatMessage> getStoredMessages() {
         Gson gson = new Gson();
         SharedPreferences sharedPreferences = getSharedPreferences(TAG, 0);
         String serializedData = sharedPreferences.getString("messages", null);

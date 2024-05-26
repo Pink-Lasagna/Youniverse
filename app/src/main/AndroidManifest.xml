@@ -16,13 +16,12 @@
         android:theme="@style/Theme.Youniverse"
         tools:targetApi="31">
         <activity
-            android:name=".card_info"
+            android:name=".ViewChats"
             android:exported="false" />
         <activity
-            android:name=".MainActivity2"
+            android:name=".card_info"
             android:exported="false"
-            android:label="@string/title_activity_main2"
-            android:theme="@style/Theme.Youniverse.NoActionBar" />
+            android:theme="@style/Theme.Youniverse.BackButton" />
         <activity
             android:name=".ChatActivity"
             android:exported="false"
@@ -31,7 +30,7 @@
             android:name=".CreateCard"
             android:exported="false"
             android:label="@string/title_activity_create_card"
-            android:theme="@style/Theme.Youniverse" />
+            android:theme="@style/Theme.Youniverse.BackButton" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

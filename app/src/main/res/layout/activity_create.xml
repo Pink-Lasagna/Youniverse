@@ -7,6 +7,7 @@
     tools:context=".CreateCard">
 
     <ScrollView
+        android:id="@+id/scrollView3"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="10dp"
@@ -64,19 +65,19 @@
                     android:maxHeight="150dp"
                     android:minWidth="150dp"
                     android:minHeight="150dp"
-                    android:src="@drawable/ic_lmao"
                     android:scaleType="centerCrop"
-                    app:shapeAppearance="@style/ShapeAppearanceOverlay.Material3.Chip"/>
+                    android:src="@drawable/ic_lmao"
+                    app:shapeAppearance="@style/ShapeAppearanceOverlay.Material3.Chip" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
+                    android:layout_marginLeft="10dp"
                     android:hint="Имя"
                     app:counterEnabled="true"
                     app:counterMaxLength="20"
-                    android:layout_marginLeft="10dp"
                     app:helperText="* Обязательное поле"
                     app:helperTextEnabled="true"
                     app:helperTextTextColor="#FF1744">
@@ -109,7 +110,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:hint="Первое сообщение"
+                android:hint="Приветствие"
                 app:helperText="* Обязательное поле"
                 app:helperTextEnabled="true"
                 app:helperTextTextColor="#FF1744">
@@ -120,53 +121,72 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <LinearLayout
-                android:id="@+id/characterGroup"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:visibility="visible">
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/Scenario"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:hint="Сценарий">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/Primer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:hint="Пример сообщений">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-            </LinearLayout>
-
-            <com.github.leandroborgesferreira.loadingbutton.customViews.CircularProgressButton
-                android:id="@+id/CreateButton"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/Scenario"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="Создать"
-                android:textStyle="bold"
-                android:layout_gravity="center"
-                android:backgroundTint="@color/purple_200"
-                app:spinning_bar_padding="6dp"
-                app:spinning_bar_width="4dp" />
+                android:hint="Сценарий">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/Primer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:hint="Пример сообщений">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <LinearLayout
+                android:id="@+id/worldGroup"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Добавьте персонажей:"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/cards"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:visibility="visible" />
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
+
+    <com.github.leandroborgesferreira.loadingbutton.customViews.CircularProgressButton
+        android:id="@+id/CreateButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:backgroundTint="@color/purple_200"
+        android:enabled="false"
+        android:text="Создать"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:spinning_bar_padding="6dp"
+        app:spinning_bar_width="4dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

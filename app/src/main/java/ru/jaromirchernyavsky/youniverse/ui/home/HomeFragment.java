@@ -28,12 +28,12 @@ import ar.com.hjg.pngj.PngReader;
 import ru.jaromirchernyavsky.youniverse.Card;
 import ru.jaromirchernyavsky.youniverse.R;
 import ru.jaromirchernyavsky.youniverse.RecyclerAdapter;
+import ru.jaromirchernyavsky.youniverse.Utilities;
 import ru.jaromirchernyavsky.youniverse.databinding.FragmentHomeBinding;
 
 public class HomeFragment extends Fragment {
     public ArrayList<Card> cards = new ArrayList<>();
     private FragmentHomeBinding binding;
-    GridView gridView;
     RecyclerView recyclerView;
     RecyclerAdapter adapter;
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -46,13 +46,21 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         recyclerView = getView().findViewById(R.id.recycle);
+        try {
+            cards = Utilities.getCards(getContext(),true);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
         adapter = new RecyclerAdapter(cards);
+        recyclerView.setAdapter(adapter);
     }
 
     @Override
     public void onResume() {
         try {
-            readCards(getContext());
+            cards = Utilities.getCards(getContext(),true);
+            adapter.notifyDataSetChanged();
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
@@ -63,37 +71,6 @@ public class HomeFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
-    }
-    public void readCards(Context context) throws JSONException {
-        cards.clear();
-        File myDir = new File(context.getFilesDir() + "/saved_images");
-        if (!myDir.exists()) {
-            boolean success = myDir.mkdirs();
-        }
-        try{
-            myDir.listFiles();
-        } catch (Exception e){
-                File file = new File (myDir, "example.png");
-                try {
-                    FileOutputStream out = new FileOutputStream(file);
-                    out.write(Files.readAllBytes(new File("ru/jaromirchernyavsky/youniverse/cards/example.png").toPath()));
-                    out.flush();
-                    out.close();
-                } catch (Exception ee) {
-                    ee.printStackTrace();
-                }
-        }
-        for (File file : myDir.listFiles()) {
-            System.out.println(file.getAbsolutePath());
-            PngReader pngr = new PngReader(file);
-            String data = pngr.getMetadata().getTxtForKey("chara");
-            if(data.isEmpty()) continue;
-            Uri uri = Uri.fromFile(file);
-            cards.add(new Card(data,uri));
-            pngr.close();
-        }
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
     }
 
     @Override
