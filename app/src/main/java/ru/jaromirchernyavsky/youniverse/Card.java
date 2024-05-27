@@ -14,17 +14,15 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class Card {
-    String data;
-    JSONObject convertedData;
-    Uri uri;
-    String name;
-    String description;
-    boolean world;
-    public Card(String data, Uri uri, boolean world) throws JSONException {
-        this.data = data;
+    public JSONObject convertedData;
+    public Uri uri;
+    public String name;
+    public String description;
+    public boolean world;
+    public Card(JSONObject convertedData, Uri uri, boolean world) throws JSONException {
         this.uri = uri;
         this.world = world;
-        convertedData = new JSONObject(new JSONObject(new String(Base64.decode(data, Base64.DEFAULT))).getString("data"));
+        this.convertedData = convertedData;
         name = convertedData.getString("name");
         description = convertedData.getString("description");
     }

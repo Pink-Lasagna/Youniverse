@@ -1,21 +1,19 @@
-package ru.jaromirchernyavsky.youniverse;
+package ru.jaromirchernyavsky.youniverse.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RadioButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.card.MaterialCardView;
-
-import org.json.JSONException;
-
 import java.util.ArrayList;
+
+import ru.jaromirchernyavsky.youniverse.Card;
+import ru.jaromirchernyavsky.youniverse.R;
 
 public class EditCardAdapter extends RecyclerView.Adapter<EditCardAdapter.ViewHolder>{
     private ArrayList<Card> added;

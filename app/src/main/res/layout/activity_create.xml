@@ -11,7 +11,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/CreateButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -25,32 +25,40 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="12dp"
                 android:fontFamily="monospace"
                 android:text="Создание карточки"
                 android:textAlignment="center"
                 android:textSize="24sp" />
 
-            <RadioGroup
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
                 android:orientation="horizontal">
 
-                <RadioButton
-                    android:id="@+id/character"
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="46dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:src="@drawable/cards" />
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/switchView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:text="Персонаж" />
+                    android:layout_gravity="center"
+                    android:layout_marginHorizontal="10dp"
+                    android:textColorHighlight="@null" />
 
-                <RadioButton
-                    android:id="@+id/world"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Мир" />
-
-            </RadioGroup>
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="46dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:src="@drawable/earth" />
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -80,7 +88,7 @@
                     app:counterMaxLength="20"
                     app:helperText="* Обязательное поле"
                     app:helperTextEnabled="true"
-                    app:helperTextTextColor="#FF1744">
+                    app:helperTextTextColor="@color/red">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
@@ -97,7 +105,7 @@
                 android:hint="Общие черты"
                 app:helperText="* Обязательное поле"
                 app:helperTextEnabled="true"
-                app:helperTextTextColor="#FF1744">
+                app:helperTextTextColor="@color/red">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -113,7 +121,7 @@
                 android:hint="Приветствие"
                 app:helperText="* Обязательное поле"
                 app:helperTextEnabled="true"
-                app:helperTextTextColor="#FF1744">
+                app:helperTextTextColor="@color/red">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"

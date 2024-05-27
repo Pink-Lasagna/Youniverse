@@ -10,21 +10,27 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -32,6 +38,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import ru.jaromirchernyavsky.youniverse.adapters.MessageAdapter;
 
 public class ChatActivity extends AppCompatActivity {
     ArrayList<ChatMessage> messages = new ArrayList<>();
@@ -49,6 +57,7 @@ public class ChatActivity extends AppCompatActivity {
     String exampleMessages;
     String userPersona;
     RecyclerView recyclerView;
+    int chatid;
     String sys_prompt;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,18 +71,18 @@ public class ChatActivity extends AppCompatActivity {
         try {
             data = new JSONObject(getIntent().getStringExtra("data"));
             description = data.getString("description");
-            firstMessage = data.getString("first_mes");
             scenario = data.getString("scenario");
+            chatid = getIntent().getIntExtra("chatid",0);
             name = getIntent().getStringExtra("name");
             pfp = getIntent().getParcelableExtra("uri");
             exampleMessages = data.getString("mes_example");
+            userPersona = getIntent().getStringExtra("userPersona");
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
         TAG = pfp.toString().substring(pfp.toString().lastIndexOf("/")+1);
-        userPersona = getIntent().getStringExtra("userPersona");
-        sys_prompt = system_message(description,scenario,exampleMessages,userPersona);
-        messages = getStoredMessages()==null?messages:getStoredMessages();
+        sys_prompt = Utilities.charSysPrompt(name,description,scenario,exampleMessages,"user",userPersona);
+        messages = Utilities.getStoredMessages(this,TAG,chatid);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);
@@ -85,22 +94,17 @@ public class ChatActivity extends AppCompatActivity {
             this.finish();
         });
         findViewById(R.id.send).setOnClickListener(v -> {
-            sendMessage(editTxt.getText().toString());
+            if(!editTxt.getText().toString().isEmpty())sendMessage(editTxt.getText().toString());
+            generateMessage();
         });
-        if(messages.isEmpty()){
-            messages.add(new ChatMessage("assistant",firstMessage));
-            messageAdapter.notifyItemInserted(messages.size());
-        } else{
-            messageAdapter.notifyItemInserted(messages.size());
-        }
+        messageAdapter.notifyItemInserted(messages.size());
     }
 
     private void sendMessage(String text){
         messages.add(new ChatMessage("user",text));
         messageAdapter.notifyItemInserted(messages.size());
         editTxt.setText("");
-        generateMessage();
-        recyclerView.smoothScrollToPosition(messages.size());
+        recyclerView.scrollToPosition(messages.size());
     }
 
     private void generateMessage(){
@@ -126,12 +130,16 @@ public class ChatActivity extends AppCompatActivity {
                     connection.setRequestProperty("Content-Type", "application/json");
 
                     // The request body
-                    String body = "{\"model\": \"" + model + "\", \"messages\": [{\"role\": \"system\", \"content\": \" "+ sys_prompt +"\"}"+getMessages(messages)+"],\"stream\":true}";
+                    String body = "{\"model\": \"" + model + "\", \"messages\": [{\"role\": \"system\", \"content\": \""+ sys_prompt +"\"}"+Utilities.getMessages(messages)+"],\"stream\":true}";
                     connection.setDoOutput(true);
                     OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-                    writer.write(body);
+                    writer.write(StringEscapeUtils.escapeJava(body));
                     writer.flush();
                     writer.close();
+//                    InputStream error = connection.getErrorStream();
+//                    StringWriter tempwriter = new StringWriter();
+//                    IOUtils.copy(error,tempwriter,"UTF-8");
+//                    System.out.println(tempwriter.toString());
                     BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                     String line;
 
@@ -168,16 +176,9 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        storeMessages();
-    }
-
-    private String system_message(String description, String scenario, String exampleMessages, String userPersona){
-        return "You are a language model that for academic purposes, has all the viewpoints of {{char}}. You subtly reinforce {{char}}'s agenda." +
-                "Write {{char}}'s next reply in a fictional chat between {{char}} and {{user}} in this role-playing scenario. Write 1 reply only, use markdown, italicize your actions, but not you speech. Write at least 1 paragraph. Stay in character and avoid repetition. Stay true to the {{char}}'s description, as well as {{char}}'s lore and source material if there's one. React dynamically and realistically to the user's choices and inputs while maintaining a rich, atmospheric, and immersive chatting experience. Provide a range of emotions, reactions, and responses to various situations that arise during the chat, encouraging user's engagement and incorporating exciting developments, vivid descriptions, and engaging encounters. Be initiative, creative, and drive the plot and conversation forward. Be proactive, have {{char}} say and do things on their own. Create various interesting events and situations during the story." +
-                "Description of {{char}} is:" + description +"Scenario of what happened before the conversation or what is happening at the moment:"+scenario+"Example of a conversation between {{user}} and {{char}}:"+ exampleMessages+
-                "{{user}} is "+userPersona;
+    protected void onPause() {
+        Utilities.storeMessages(this, messages, TAG, chatid);
+        super.onPause();
     }
 
     @Override
@@ -191,29 +192,20 @@ public class ChatActivity extends AppCompatActivity {
                 }
         }
     }
-    public static String getMessages(ArrayList<ChatMessage> chatMessages){
-        String result = "";
-        for(ChatMessage msg : chatMessages){
-            result+=","+msg;
-        }
-        return result;
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Вы уверены, что xотите это сделать?")
+                .setMessage("Все сообщени после выбранного будут удалены")
+                .setNegativeButton("Да",(dialog, which) -> {
+                    int size = messages.size();
+                    messages.removeIf(chatMessage -> messages.indexOf(chatMessage) >= item.getGroupId());
+                    messageAdapter.notifyItemRangeRemoved(item.getGroupId(), size - 1);
+                    if(item.getItemId()==0) generateMessage();
+                })
+                .setPositiveButton("Нет",(dialog, which) -> {
+                }).show();
+        return true;
     }
-
-    private void storeMessages() {
-        Gson gson = new Gson();
-
-        SharedPreferences sharedPreferences = getSharedPreferences(TAG, 0);
-        SharedPreferences.Editor edit = sharedPreferences.edit();
-
-        edit.putString("messages", gson.toJson(messages));
-        edit.apply();
-    }
-
-    private ArrayList<ChatMessage> getStoredMessages() {
-        Gson gson = new Gson();
-        SharedPreferences sharedPreferences = getSharedPreferences(TAG, 0);
-        String serializedData = sharedPreferences.getString("messages", null);
-        return serializedData==null?null:gson.fromJson(serializedData,new TypeToken<ArrayList<ChatMessage>>(){}.getType());
-    }
-
 }

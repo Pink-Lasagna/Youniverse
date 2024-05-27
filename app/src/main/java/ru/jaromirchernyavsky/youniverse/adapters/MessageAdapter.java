@@ -1,15 +1,18 @@
-package ru.jaromirchernyavsky.youniverse;
+package ru.jaromirchernyavsky.youniverse.adapters;
 
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+
+import ru.jaromirchernyavsky.youniverse.ChatMessage;
+import ru.jaromirchernyavsky.youniverse.R;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
     ArrayList<ChatMessage> messages;
@@ -30,9 +33,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        if(holder.getItemViewType()!=2){
+        if(holder.getItemViewType()!=2) {
             holder.message.setText(messages.get(position).getSpannable());
         }
+
     }
 
     @Override
@@ -40,8 +44,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         switch (messages.get(position).getRole()){
             case "user":
                 return 1;
-            case "system":
-                return 2;
             default:
                 return 0;
         }
@@ -52,12 +54,27 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         return messages.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
         public TextView message;
 
         public ViewHolder(View itemView) {
             super(itemView);
             message = itemView.findViewById(R.id.message);
+            itemView.setOnCreateContextMenuListener(this);
+        }
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            if(this.getAdapterPosition()!=0){
+                switch (this.getItemViewType()){
+                    case 1:
+                        menu.add(this.getAdapterPosition(),1,0,"Удалить");
+                        break;
+                    case 0:
+                        menu.add(this.getAdapterPosition(),0,0,"Перегенирировать");
+                        menu.add(this.getAdapterPosition(),1,0,"Удалить");
+                        break;
+                }
+            }
         }
     }
 }

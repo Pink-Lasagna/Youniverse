@@ -1,20 +1,16 @@
 package ru.jaromirchernyavsky.youniverse;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Base64;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -23,25 +19,15 @@ import android.widget.LinearLayout;
 import com.github.leandroborgesferreira.loadingbutton.customViews.CircularProgressButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import ar.com.hjg.pngj.IImageLine;
-import ar.com.hjg.pngj.PngReader;
-import ar.com.hjg.pngj.PngWriter;
-import ar.com.hjg.pngj.chunks.ChunkCopyBehaviour;
-import ar.com.hjg.pngj.chunks.PngChunkTEXT;
-import ar.com.hjg.pngj.chunks.PngChunkTextVar;
+import ru.jaromirchernyavsky.youniverse.adapters.EditCardAdapter;
+import ru.jaromirchernyavsky.youniverse.adapters.WorldCardAdapter;
 
 public class card_info extends AppCompatActivity  {
     String name;
@@ -99,6 +85,13 @@ public class card_info extends AppCompatActivity  {
                 linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
                 recyclerView.setLayoutManager(linearLayoutManager);
                 cards = Utilities.getCardsFromJsonList(this,data.getString("characters"));
+                if(cards.contains(null)){
+                    cards.remove(null);
+                    Bitmap finalBitmap = Utilities.getContactBitmapFromURI(this,pfp);
+                    new File(pfp.getPath()).delete();
+                    String metadata = Utilities.generateMetadata("",til_summary,til_first_message,til_example,til_name,til_scenario,editCardAdapter.getAdded());
+                    Utilities.saveCard(this,finalBitmap,metadata,pfp.getLastPathSegment(),world,false);
+                }
                 linearLayout.setVisibility(View.VISIBLE);
                 WorldCardAdapter worldCardAdapter = new WorldCardAdapter(cards);
                 recyclerView.setAdapter(worldCardAdapter);
@@ -113,10 +106,11 @@ public class card_info extends AppCompatActivity  {
         til_example.getEditText().setText(exampleMessages);
         image.setImageURI(pfp);
         btn_chat.setOnClickListener(v -> {
-            Intent intent = new Intent(v.getContext(), ChatActivity.class);
+            Intent intent = new Intent(v.getContext(), ViewChats.class);
             intent.putExtra("name",name);
             intent.putExtra("uri",pfp);
             intent.putExtra("data",data.toString());
+            intent.putExtra("firstMessage",firstMessage);
             intent.putExtra("userPersona","human");
             v.getContext().startActivity(intent);
         });

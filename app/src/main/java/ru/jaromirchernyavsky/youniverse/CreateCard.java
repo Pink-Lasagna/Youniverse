@@ -6,10 +6,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
@@ -23,15 +26,20 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.leandroborgesferreira.loadingbutton.customViews.CircularProgressButton;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.gson.Gson;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class CreateCard extends AppCompatActivity implements View.OnFocusChangeListener {
+import ru.jaromirchernyavsky.youniverse.adapters.EditCardAdapter;
+
+public class CreateCard extends AppCompatActivity implements View.OnFocusChangeListener, View.OnClickListener {
     boolean world = false;
     Uri imageuri;
     ImageView image;
@@ -42,12 +50,45 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
             new ActivityResultCallback<ActivityResult>() {
                 @Override
                 public void onActivityResult(ActivityResult result) {
-                    Log.i("gs",result.toString());
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         // There are no request codes
                         Intent data = result.getData();
                         imageuri = data.getData();
                         image.setImageURI(imageuri);
+                        try {
+                            InputStream iStream =   getContentResolver().openInputStream(imageuri);
+                            JSONObject jsonData = Utilities.getMetadataFromFile(iStream);
+                            name.getEditText().setText(jsonData.getString("name"));
+                            summary.getEditText().setText(jsonData.getString("description"));
+                            first_message.getEditText().setText(jsonData.getString("first_mes"));
+                            scenario.getEditText().setText(jsonData.getString("scenario"));
+                            example.getEditText().setText(jsonData.getString("mes_example"));
+                            ArrayList<Card> jsonCards = new ArrayList<>();
+                            try {
+                                jsonCards = Utilities.getCardsFromJsonList(getApplicationContext(),jsonData.getString("characters"));
+                            } catch (JSONException e){
+                                jsonCards = null;
+                            }
+                            if(jsonCards!=null){
+                                materialSwitch.setChecked(true);
+                                world = true;
+                                name.setHint("Имя");
+                                summary.setHint("Описание");
+                                worldlayout.setVisibility(View.GONE);
+                                cards = jsonCards;
+                            } else{
+                                materialSwitch.setChecked(false);
+                                world = false;
+                                name.setHint("Название");
+                                summary.setHint("Сюжет мира");
+                                worldlayout.setVisibility(View.VISIBLE);
+                            }
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        } catch (FileNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+
                         btn.setEnabled(imageuri!=null&&!name.getEditText().getText().toString().isEmpty() && !summary.getEditText().getText().toString().isEmpty() && !first_message.getEditText().getText().toString().isEmpty());
                     }
                 }
@@ -55,14 +96,20 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
     private static final int PERMISSION_CODE = 1001;
     TextInputLayout name;
     TextInputLayout summary;
+    RadioButton radioWorld;
     TextInputLayout first_message;
+    TextInputLayout scenario;
     CircularProgressButton btn;
+    TextInputLayout example;
+    MaterialSwitch materialSwitch;
+    LinearLayout worldlayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ActionBar bar = getSupportActionBar();
         bar.setDisplayShowTitleEnabled(false);
         bar.setDisplayHomeAsUpEnabled(true);
+        bar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_new_24);
         setContentView(R.layout.activity_create);
         image = findViewById(R.id.image);
         image.setOnClickListener(v -> {
@@ -97,28 +144,18 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
         summary.getEditText().setOnFocusChangeListener(this);
         first_message = findViewById(R.id.first_message);
         first_message.getEditText().setOnFocusChangeListener(this);
-        TextInputLayout scenario = findViewById(R.id.Scenario);
-        TextInputLayout example = findViewById(R.id.Primer);
+        scenario = findViewById(R.id.Scenario);
+        example = findViewById(R.id.Primer);
         RecyclerView recyclerView = findViewById(R.id.cards);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        LinearLayout worldlayout = findViewById(R.id.worldGroup);
+        worldlayout = findViewById(R.id.worldGroup);
         recyclerView.setLayoutManager(linearLayoutManager);
         EditCardAdapter editCardAdapter = new EditCardAdapter(new ArrayList<Card>(),cards);
         recyclerView.setAdapter(editCardAdapter);
-        findViewById(R.id.world).setOnClickListener(v -> {
-            world = true;
-            name.setHint("Название");
-            summary.setHint("Сюжет мира");
-            worldlayout.setVisibility(View.VISIBLE);
-        });
-        findViewById(R.id.character).setOnClickListener(v -> {
-            world = false;
-            name.setHint("Имя");
-            summary.setHint("Описание");
-            worldlayout.setVisibility(View.GONE);
-        });
+        materialSwitch = findViewById(R.id.switchView);
         btn = findViewById(R.id.CreateButton);
+        materialSwitch.setOnClickListener(this);
         btn.setOnClickListener(v -> {
             btn.startAnimation();
             String result = Utilities.generateMetadata(username,summary,first_message,example,name,scenario,editCardAdapter.getAdded());
@@ -151,5 +188,28 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
         btn.setEnabled(imageuri!=null&&!name.getEditText().getText().toString().isEmpty() && !summary.getEditText().getText().toString().isEmpty() && !first_message.getEditText().getText().toString().isEmpty());
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == android.R.id.home) {
+            getOnBackPressedDispatcher().onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(world){
+            world = false;
+            name.setHint("Имя");
+            summary.setHint("Описание");
+            worldlayout.setVisibility(View.GONE);
+        } else{
+            world = true;
+            name.setHint("Название");
+            summary.setHint("Сюжет мира");
+            worldlayout.setVisibility(View.VISIBLE);
+        }
     }
 }

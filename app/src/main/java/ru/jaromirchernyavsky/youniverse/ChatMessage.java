@@ -9,6 +9,7 @@ import android.text.style.StyleSpan;
 
 import androidx.annotation.NonNull;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 

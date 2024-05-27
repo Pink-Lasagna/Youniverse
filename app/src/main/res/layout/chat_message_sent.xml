@@ -17,7 +17,7 @@
         <com.google.android.material.imageview.ShapeableImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/material_dynamic_neutral_variant10"
+            android:background="@color/material_dynamic_neutral_variant20"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:shapeAppearance="@style/ShapeAppearanceOverlay.Material3.Chip" />

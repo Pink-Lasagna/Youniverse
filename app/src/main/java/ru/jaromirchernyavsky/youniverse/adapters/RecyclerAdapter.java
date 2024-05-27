@@ -1,13 +1,10 @@
-package ru.jaromirchernyavsky.youniverse;
+package ru.jaromirchernyavsky.youniverse.adapters;
 
-import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,6 +13,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
 import java.util.ArrayList;
+
+import ru.jaromirchernyavsky.youniverse.Card;
+import ru.jaromirchernyavsky.youniverse.R;
+import ru.jaromirchernyavsky.youniverse.card_info;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
     private ArrayList<Card> cards;

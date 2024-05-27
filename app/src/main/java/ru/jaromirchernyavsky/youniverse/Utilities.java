@@ -2,12 +2,15 @@ package ru.jaromirchernyavsky.youniverse;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Base64;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,6 +31,7 @@ import java.util.concurrent.Executors;
 import ar.com.hjg.pngj.IImageLine;
 import ar.com.hjg.pngj.PngReader;
 import ar.com.hjg.pngj.PngWriter;
+import ar.com.hjg.pngj.PngjInputException;
 import ar.com.hjg.pngj.chunks.ChunkCopyBehaviour;
 import ar.com.hjg.pngj.chunks.PngChunkTEXT;
 import ar.com.hjg.pngj.chunks.PngChunkTextVar;
@@ -164,9 +168,13 @@ public class Utilities {
     public static ArrayList<Card> getCardsFromJsonList(Context context, String json) throws JSONException {
         ArrayList<Card> cards = new ArrayList<>();
         JSONArray jsonArray = new JSONArray(json);
-        for(int i=0;i<jsonArray.length();i++){
+        for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
-            cards.add(getCardFromFileName(context,jsonObject.getString("fileName"),false));
+            try{
+                cards.add(getCardFromFileName(context, jsonObject.getString("fileName"), false));
+            } catch (PngjInputException e){
+                cards.add(null);
+            }
         }
         return cards;
     }
@@ -179,18 +187,70 @@ public class Utilities {
         String dir = context.getFilesDir()+"/saved_images/";
         dir += world? "worlds/":"chars/";
         File fileCard = new File(dir+fileName);
-        PngReader pngr = new PngReader(fileCard);
-        String data = pngr.getMetadata().getTxtForKey("chara");
+        JSONObject data = getMetadataFromFile(fileCard.toString());
         Uri uri = Uri.fromFile(fileCard);
-        pngr.close();
         return new Card(data,uri,world);
+    }
+
+    public static String getMessages(ArrayList<ChatMessage> chatMessages){
+        String result = "";
+        for(ChatMessage msg : chatMessages){
+            result+=","+msg;
+        }
+        return result;
+    }
+
+    public static JSONObject getMetadataFromFile(String filePath) throws JSONException {
+        File file = new File(filePath);
+        PngReader pngr = new PngReader(file);
+        String result = pngr.getMetadata().getTxtForKey("chara");
+        JSONObject data = new JSONObject(new JSONObject(new String(Base64.decode(result, Base64.DEFAULT))).getString("data"));;
+        pngr.close();
+        return data;
+    }
+
+    public static JSONObject getMetadataFromFile(InputStream inputStream) throws JSONException {
+        PngReader pngr = new PngReader(inputStream);
+        String result = pngr.getMetadata().getTxtForKey("chara");
+        JSONObject data = new JSONObject(new JSONObject(new String(Base64.decode(result, Base64.DEFAULT))).getString("data"));;
+        pngr.close();
+        return data;
     }
 
     public static String getStringJsonfromCards(ArrayList<Card> cards){
         String chars = "";
+        if(cards.isEmpty()) return "";
         for(Card card : cards){
             chars += card.toJsonStringFile()+",";
         }
         return chars.substring(0,chars.length()-1);
+    }
+
+    public static ArrayList<ChatMessage> getStoredMessages(Context context,String TAG,int chatid){
+        Gson gson = new Gson();
+        SharedPreferences sharedPreferences = context.getSharedPreferences(TAG, 0);
+        String serializedData = sharedPreferences.getString(Integer.toString(chatid), null);
+        return serializedData==null?null:gson.fromJson(serializedData,new TypeToken<ArrayList<ChatMessage>>(){}.getType());
+    }
+
+    public static void storeMessages(Context context, ArrayList<ChatMessage> messages,String TAG,int chatid){
+        Gson gson = new Gson();
+
+        SharedPreferences sharedPreferences = context.getSharedPreferences(TAG, 0);
+        SharedPreferences.Editor edit = sharedPreferences.edit();
+
+        edit.putString(Integer.toString(chatid), gson.toJson(messages));
+        edit.apply();
+    }
+
+
+    public static String charSysPrompt(String name,String description, String scenario, String exampleMessages, String username, String userPersona){
+        return "Притворись персонажем с именем "+name+". Твоя задача - разговаривать с пользователем с именем "+username+", который описан как "+userPersona+
+                ". Ты должен придерживаться следующей предыстории и текущей ситуации:\n Предыстория и сценарий:\n "+scenario+
+                "\nПример сообщений:\n "+exampleMessages+
+                "Ты должен оставаться в образе "+name+" на протяжении всего разговора, учитывать предысторию и текущую ситуацию," +
+                " а также поддерживать стиль и тон сообщений, приведенных в примере. " +
+                "Используй активное слушание, задавай вопросы и поддерживай диалог в рамках заданного сценария и в стиле"+name+
+                "В каждом своем ответе описывай свои действия и обособляй их звездочками. Например, *улыбается* или *показывает на старинное здание*.";
     }
 }

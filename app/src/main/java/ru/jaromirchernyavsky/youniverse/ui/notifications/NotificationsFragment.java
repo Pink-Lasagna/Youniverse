@@ -5,13 +5,10 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -21,9 +18,8 @@ import java.util.ArrayList;
 
 import ru.jaromirchernyavsky.youniverse.Card;
 import ru.jaromirchernyavsky.youniverse.R;
-import ru.jaromirchernyavsky.youniverse.RecyclerAdapter;
+import ru.jaromirchernyavsky.youniverse.adapters.RecyclerAdapter;
 import ru.jaromirchernyavsky.youniverse.Utilities;
-import ru.jaromirchernyavsky.youniverse.databinding.FragmentHomeBinding;
 import ru.jaromirchernyavsky.youniverse.databinding.FragmentNotificationsBinding;
 
 public class NotificationsFragment extends Fragment {

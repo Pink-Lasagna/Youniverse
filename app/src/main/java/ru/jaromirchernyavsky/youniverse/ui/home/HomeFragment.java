@@ -1,15 +1,10 @@
 package ru.jaromirchernyavsky.youniverse.ui.home;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Picture;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,15 +14,11 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import org.json.JSONException;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.nio.file.Files;
 import java.util.ArrayList;
 
-import ar.com.hjg.pngj.PngReader;
 import ru.jaromirchernyavsky.youniverse.Card;
 import ru.jaromirchernyavsky.youniverse.R;
-import ru.jaromirchernyavsky.youniverse.RecyclerAdapter;
+import ru.jaromirchernyavsky.youniverse.adapters.RecyclerAdapter;
 import ru.jaromirchernyavsky.youniverse.Utilities;
 import ru.jaromirchernyavsky.youniverse.databinding.FragmentHomeBinding;
 

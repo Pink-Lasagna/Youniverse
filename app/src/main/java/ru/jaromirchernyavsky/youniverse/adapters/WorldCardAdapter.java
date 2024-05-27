@@ -1,22 +1,18 @@
-package ru.jaromirchernyavsky.youniverse;
+package ru.jaromirchernyavsky.youniverse.adapters;
 
-import android.content.Intent;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RadioButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.card.MaterialCardView;
-import com.google.android.material.datepicker.MaterialCalendar;
-
-import java.io.File;
 import java.util.ArrayList;
+
+import ru.jaromirchernyavsky.youniverse.Card;
+import ru.jaromirchernyavsky.youniverse.R;
 
 public class WorldCardAdapter extends RecyclerView.Adapter<WorldCardAdapter.ViewHolder>{
     private ArrayList<Card> cards;
