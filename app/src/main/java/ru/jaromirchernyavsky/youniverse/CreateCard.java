@@ -37,6 +37,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Random;
 
+import ar.com.hjg.pngj.PngjInputException;
 import ru.jaromirchernyavsky.youniverse.adapters.EditCardAdapter;
 
 public class CreateCard extends AppCompatActivity implements View.OnFocusChangeListener, View.OnClickListener {
@@ -87,6 +88,7 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
                             throw new RuntimeException(e);
                         } catch (FileNotFoundException e) {
                             throw new RuntimeException(e);
+                        } catch (PngjInputException e){
                         }
 
                         btn.setEnabled(imageuri!=null&&!name.getEditText().getText().toString().isEmpty() && !summary.getEditText().getText().toString().isEmpty() && !first_message.getEditText().getText().toString().isEmpty());

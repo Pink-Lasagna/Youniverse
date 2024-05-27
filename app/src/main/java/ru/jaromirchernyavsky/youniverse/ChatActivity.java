@@ -59,6 +59,7 @@ public class ChatActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     int chatid;
     String sys_prompt;
+    boolean world;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,11 +78,17 @@ public class ChatActivity extends AppCompatActivity {
             pfp = getIntent().getParcelableExtra("uri");
             exampleMessages = data.getString("mes_example");
             userPersona = getIntent().getStringExtra("userPersona");
+            world = getIntent().getBooleanExtra("world",false);
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
         TAG = pfp.toString().substring(pfp.toString().lastIndexOf("/")+1);
-        sys_prompt = Utilities.charSysPrompt(name,description,scenario,exampleMessages,"user",userPersona);
+        if(world){
+            sys_prompt = Utilities.worldSysPrompt(name,description,scenario,exampleMessages,"user",userPersona);
+        } else{
+            sys_prompt = Utilities.charSysPrompt(name,description,scenario,exampleMessages,"user",userPersona);
+        }
+
         messages = Utilities.getStoredMessages(this,TAG,chatid);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
@@ -132,8 +139,9 @@ public class ChatActivity extends AppCompatActivity {
                     // The request body
                     String body = "{\"model\": \"" + model + "\", \"messages\": [{\"role\": \"system\", \"content\": \""+ sys_prompt +"\"}"+Utilities.getMessages(messages)+"],\"stream\":true}";
                     connection.setDoOutput(true);
+                    System.out.println(body);
                     OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
-                    writer.write(StringEscapeUtils.escapeJava(body));
+                    writer.write(body);
                     writer.flush();
                     writer.close();
 //                    InputStream error = connection.getErrorStream();

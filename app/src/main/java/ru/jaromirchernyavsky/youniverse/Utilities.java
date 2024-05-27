@@ -12,6 +12,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -245,12 +246,25 @@ public class Utilities {
 
 
     public static String charSysPrompt(String name,String description, String scenario, String exampleMessages, String username, String userPersona){
-        return "Притворись персонажем с именем "+name+". Твоя задача - разговаривать с пользователем с именем "+username+", который описан как "+userPersona+
+        return "Притворись персонажем с именем "+name+", вот его краткое описание\n:"+description+"\n Твоя задача - разговаривать с пользователем с именем "+username+", который описан как "+userPersona+
                 ". Ты должен придерживаться следующей предыстории и текущей ситуации:\n Предыстория и сценарий:\n "+scenario+
                 "\nПример сообщений:\n "+exampleMessages+
                 "Ты должен оставаться в образе "+name+" на протяжении всего разговора, учитывать предысторию и текущую ситуацию," +
                 " а также поддерживать стиль и тон сообщений, приведенных в примере. " +
                 "Используй активное слушание, задавай вопросы и поддерживай диалог в рамках заданного сценария и в стиле"+name+
                 "В каждом своем ответе описывай свои действия и обособляй их звездочками. Например, *улыбается* или *показывает на старинное здание*.";
+    }
+
+    public static String worldSysPrompt(String name,String description, String scenario, String exampleMessages, String username, String userPersona){
+        return StringEscapeUtils.escapeJava(String.format(
+                        "Притворись миром с именем \"%s\". Твоя задача - описывать и развивать мир вокруг пользователя с именем \"%s\", который описан как \"%s\". Ты должен придерживаться следующей предыстории и текущей ситуации:\\n" +
+                        "Описание и сюжет:\n" +
+                        "\"%s\"\n" +
+                        "Предыстория и сценарий:\n" +
+                        "\"%s\"\n" +
+                        "Пример сообщений:\n" +
+                        "\"%s\"\n" +
+                        "Ты должен генерировать действия существ, находящихся в мире \"%s\", и описывать последствия действий персонажа \"%s\". Также ты должен вкратце и детализировано описывать сцену вокруг пользователя в данный момент, используя яркие эпитеты и образы. Генерируй речь существ и персонажей, которых встречает пользователь, придавая им уникальные голоса и характерные черты. Обособляй все описания и действия звездочками *, кроме прямой речи персонажей.",
+                name, username, userPersona, description, scenario, exampleMessages, name, username));
     }
 }

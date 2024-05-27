@@ -112,6 +112,7 @@ public class card_info extends AppCompatActivity  {
             intent.putExtra("data",data.toString());
             intent.putExtra("firstMessage",firstMessage);
             intent.putExtra("userPersona","human");
+            intent.putExtra("world",world);
             v.getContext().startActivity(intent);
         });
         btn_edit.setOnClickListener(v -> {

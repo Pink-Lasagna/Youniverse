@@ -65,7 +65,7 @@ public class ChatMessage {
     @NonNull
     @Override
     public String toString() {
-        return "{\"role\":\"" + role + "\",\"content\":\"" + text + "\"}";
+        return "{\"role\":\"" + role + "\",\"content\":\"" + StringEscapeUtils.escapeJava(text) + "\"}";
     }
 
     public ChatMessage(JSONObject json) throws JSONException {
