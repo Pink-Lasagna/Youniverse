@@ -9,13 +9,13 @@
               <type value="RUNNING_DEVICE_TARGET" />
               <deviceKey>
                 <Key>
-                  <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="C:\Users\jarom\.android\avd\Medium_Phone_API_34.avd" />
+                  <type value="SERIAL_NUMBER" />
+                  <value value="adb-A9FQ6R4112004974-EWKGq2._adb-tls-connect._tcp" />
                 </Key>
               </deviceKey>
             </Target>
           </runningDeviceTargetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-05-27T12:04:39.030798100Z" />
+          <timeTargetWasSelectedWithDropDown value="2024-05-27T15:11:44.820915Z" />
         </State>
       </entry>
     </value>

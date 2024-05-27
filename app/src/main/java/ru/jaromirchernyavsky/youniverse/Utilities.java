@@ -180,7 +180,8 @@ public class Utilities {
         return cards;
     }
 
-    public static String generateMetadata(String username, TextInputLayout summary, TextInputLayout first_message, TextInputLayout example, TextInputLayout name, TextInputLayout scenario, ArrayList<Card> cards){
+    public static String generateMetadata(Context context,  TextInputLayout summary, TextInputLayout first_message, TextInputLayout example, TextInputLayout name, TextInputLayout scenario, ArrayList<Card> cards){
+        String username = getName(context);
         return "{\"data\":{\"alternate_greetings\": [], \"avatar\": \"none\",\"character_version\":\"main\",\"creator\": \""+username+"\",\"creator_notes\": \"\",\"description\": \""+summary.getEditText().getText().toString()+"\",\"first_mes\": \""+first_message.getEditText().getText().toString()+"\",\"mes_example\": \""+example.getEditText().getText().toString()+"\",\"name\": \""+name.getEditText().getText().toString()+"\",\"post_history_instructions\": \"\",\"scenario\": \""+scenario.getEditText().getText().toString()+"\",\"system_prompt\": \"\",\"tags\": [],\"characters\":["+getStringJsonfromCards(cards)+"]},\"spec\": \"chara_card_v2\",\"spec_version\": \"2.0\"}";
     }
 
@@ -201,6 +202,11 @@ public class Utilities {
         return result;
     }
 
+    public static String getName(Context context){
+        SharedPreferences pref = context.getSharedPreferences("UserInfo",0);
+        String username = pref.getString("username","user");
+        return username;
+    }
     public static JSONObject getMetadataFromFile(String filePath) throws JSONException {
         File file = new File(filePath);
         PngReader pngr = new PngReader(file);
@@ -246,13 +252,13 @@ public class Utilities {
 
 
     public static String charSysPrompt(String name,String description, String scenario, String exampleMessages, String username, String userPersona){
-        return "Притворись персонажем с именем "+name+", вот его краткое описание\n:"+description+"\n Твоя задача - разговаривать с пользователем с именем "+username+", который описан как "+userPersona+
+        return StringEscapeUtils.escapeJava("Притворись персонажем с именем "+name+", вот его краткое описание\n:"+description+"\n Твоя задача - разговаривать с пользователем с именем "+username+", который описан как "+userPersona+
                 ". Ты должен придерживаться следующей предыстории и текущей ситуации:\n Предыстория и сценарий:\n "+scenario+
                 "\nПример сообщений:\n "+exampleMessages+
                 "Ты должен оставаться в образе "+name+" на протяжении всего разговора, учитывать предысторию и текущую ситуацию," +
                 " а также поддерживать стиль и тон сообщений, приведенных в примере. " +
                 "Используй активное слушание, задавай вопросы и поддерживай диалог в рамках заданного сценария и в стиле"+name+
-                "В каждом своем ответе описывай свои действия и обособляй их звездочками. Например, *улыбается* или *показывает на старинное здание*.";
+                "В каждом своем ответе описывай свои действия и обособляй их звездочками. Например, *улыбается* или *показывает на старинное здание*.");
     }
 
     public static String worldSysPrompt(String name,String description, String scenario, String exampleMessages, String username, String userPersona){

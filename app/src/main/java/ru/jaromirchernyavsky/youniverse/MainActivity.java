@@ -1,12 +1,18 @@
 package ru.jaromirchernyavsky.youniverse;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Base64;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.annotation.Nullable;
@@ -54,5 +60,29 @@ public class MainActivity extends AppCompatActivity {
         });
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupWithNavController(binding.navView, navController);
+    }
+
+    @Override
+    protected void onResume() {
+        SharedPreferences prefs = getSharedPreferences("UserInfo", 0);
+        boolean previouslyStarted = prefs.getBoolean("launched", false);
+        if(!previouslyStarted) {
+            SharedPreferences.Editor edit = prefs.edit();
+            edit.putBoolean("launched", true);
+            final EditText input = new EditText(MainActivity.this);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT);
+            input.setLayoutParams(lp);
+            MaterialAlertDialogBuilder alert = new MaterialAlertDialogBuilder(this);
+            alert.setTitle("Введите свое имя");
+            alert.setView(input);
+            alert.setPositiveButton("Выбрать", (dialog, which) -> {
+                edit.putString("username",input.getText().toString());
+                edit.apply();
+            });
+            alert.show();
+        }
+        super.onResume();
     }
 }

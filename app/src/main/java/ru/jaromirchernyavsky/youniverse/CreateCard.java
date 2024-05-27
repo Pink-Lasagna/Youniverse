@@ -84,6 +84,7 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
                                 summary.setHint("Сюжет мира");
                                 worldlayout.setVisibility(View.VISIBLE);
                             }
+                            materialSwitch.setClickable(false);
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
                         } catch (FileNotFoundException e) {
@@ -160,7 +161,7 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
         materialSwitch.setOnClickListener(this);
         btn.setOnClickListener(v -> {
             btn.startAnimation();
-            String result = Utilities.generateMetadata(username,summary,first_message,example,name,scenario,editCardAdapter.getAdded());
+            String result = Utilities.generateMetadata(this,summary,first_message,example,name,scenario,editCardAdapter.getAdded());
             Random random = new Random();
             String typeString = world?"World-":"Character-";
             String filename = typeString+random.nextInt(999999999);

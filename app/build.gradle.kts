@@ -36,7 +36,6 @@ android {
 }
 dependencies {
     implementation("commons-io:commons-io:2.16.1")
-    // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation("com.google.code.gson:gson:2.11.0")
     implementation("org.apache.commons:commons-imaging:1.0.0-alpha5")
     implementation("androidx.appcompat:appcompat:1.6.1")

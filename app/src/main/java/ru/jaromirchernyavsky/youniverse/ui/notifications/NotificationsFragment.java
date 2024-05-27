@@ -37,8 +37,9 @@ public class NotificationsFragment extends Fragment {
         return root;
     }
 
+
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onResume() {
         recyclerView = getView().findViewById(R.id.recycle);
         try {
             cards = Utilities.getCards(getContext(),false);
@@ -48,16 +49,6 @@ public class NotificationsFragment extends Fragment {
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
         adapter = new RecyclerAdapter(cards);
         recyclerView.setAdapter(adapter);
-    }
-
-    @Override
-    public void onResume() {
-        try {
-            cards = Utilities.getCards(getContext(),false);
-            adapter.notifyDataSetChanged();
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
         super.onResume();
     }
 

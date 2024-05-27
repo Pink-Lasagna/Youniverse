@@ -34,8 +34,9 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
+
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onResume() {
         recyclerView = getView().findViewById(R.id.recycle);
         try {
             cards = Utilities.getCards(getContext(),true);
@@ -45,16 +46,6 @@ public class HomeFragment extends Fragment {
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
         adapter = new RecyclerAdapter(cards);
         recyclerView.setAdapter(adapter);
-    }
-
-    @Override
-    public void onResume() {
-        try {
-            cards = Utilities.getCards(getContext(),true);
-            adapter.notifyDataSetChanged();
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
         super.onResume();
     }
 

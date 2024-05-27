@@ -83,10 +83,11 @@ public class ChatActivity extends AppCompatActivity {
             throw new RuntimeException(e);
         }
         TAG = pfp.toString().substring(pfp.toString().lastIndexOf("/")+1);
+        String username = Utilities.getName(this);
         if(world){
-            sys_prompt = Utilities.worldSysPrompt(name,description,scenario,exampleMessages,"user",userPersona);
+            sys_prompt = Utilities.worldSysPrompt(name,description,scenario,exampleMessages,username,"");
         } else{
-            sys_prompt = Utilities.charSysPrompt(name,description,scenario,exampleMessages,"user",userPersona);
+            sys_prompt = Utilities.charSysPrompt(name,description,scenario,exampleMessages,username,"");
         }
 
         messages = Utilities.getStoredMessages(this,TAG,chatid);

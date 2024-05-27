@@ -89,7 +89,7 @@ public class card_info extends AppCompatActivity  {
                     cards.remove(null);
                     Bitmap finalBitmap = Utilities.getContactBitmapFromURI(this,pfp);
                     new File(pfp.getPath()).delete();
-                    String metadata = Utilities.generateMetadata("",til_summary,til_first_message,til_example,til_name,til_scenario,editCardAdapter.getAdded());
+                    String metadata = Utilities.generateMetadata(this,til_summary,til_first_message,til_example,til_name,til_scenario,editCardAdapter.getAdded());
                     Utilities.saveCard(this,finalBitmap,metadata,pfp.getLastPathSegment(),world,false);
                 }
                 linearLayout.setVisibility(View.VISIBLE);
@@ -122,7 +122,7 @@ public class card_info extends AppCompatActivity  {
             btn.startAnimation();
             Bitmap finalBitmap = Utilities.getContactBitmapFromURI(this,pfp);
             new File(pfp.getPath()).delete();
-            String metadata = Utilities.generateMetadata("",til_summary,til_first_message,til_example,til_name,til_scenario,editCardAdapter.getAdded());
+            String metadata = Utilities.generateMetadata(this,til_summary,til_first_message,til_example,til_name,til_scenario,editCardAdapter.getAdded());
             Utilities.saveCard(this,finalBitmap,metadata,pfp.getLastPathSegment(),world,false);
             cards = editCardAdapter.getAdded();
             toggleEdits();

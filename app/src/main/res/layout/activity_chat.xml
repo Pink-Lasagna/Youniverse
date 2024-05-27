@@ -86,7 +86,7 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:ems="10"
-            android:hint="Напиши"
+            android:hint="Напишите сообщение..."
             android:imeOptions="actionSend"
             android:inputType="textMultiLine"
             android:outlineProvider="background"
@@ -102,7 +102,7 @@
             android:backgroundTint="@color/cardview_dark_background"
             android:minWidth="45dp"
             android:minHeight="45dp"
-            android:src="@drawable/baseline_4g_mobiledata_24" />
+            android:src="@drawable/send" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
