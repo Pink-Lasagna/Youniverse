@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.leandroborgesferreira.loadingbutton.customViews.CircularProgressButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -45,7 +46,6 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
     Uri imageuri;
     ImageView image;
     ArrayList<Card> cards;
-    String username;
     ActivityResultLauncher<Intent> pickImage = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
@@ -57,6 +57,14 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
                         imageuri = data.getData();
                         image.setImageURI(imageuri);
                         try {
+                            MaterialAlertDialogBuilder alert = new MaterialAlertDialogBuilder(getBaseContext());
+                            alert.setTitle("Вы хотите импортировать данные из фото?");
+                            alert.setMessage("При сканировании фото были найдены данные. Импортировав их, вы потеряете все, что вы вписали");
+                            alert.setPositiveButton("Да",(dialog, which) -> {});
+                            alert.setNegativeButton("Нет",(dialog, which) -> {
+                                throw new PngjInputException("Ignore this");
+                            });
+                            alert.show();
                             InputStream iStream =   getContentResolver().openInputStream(imageuri);
                             JSONObject jsonData = Utilities.getMetadataFromFile(iStream);
                             name.getEditText().setText(jsonData.getString("name"));
@@ -99,7 +107,6 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
     private static final int PERMISSION_CODE = 1001;
     TextInputLayout name;
     TextInputLayout summary;
-    RadioButton radioWorld;
     TextInputLayout first_message;
     TextInputLayout scenario;
     CircularProgressButton btn;

@@ -1,11 +1,19 @@
 package ru.jaromirchernyavsky.youniverse;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,6 +23,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.github.leandroborgesferreira.loadingbutton.customViews.CircularProgressButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -24,12 +33,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
+import ar.com.hjg.pngj.PngjInputException;
 import ru.jaromirchernyavsky.youniverse.adapters.EditCardAdapter;
 import ru.jaromirchernyavsky.youniverse.adapters.WorldCardAdapter;
 
-public class card_info extends AppCompatActivity  {
+public class card_info extends AppCompatActivity implements View.OnFocusChangeListener {
     String name;
     Uri pfp;
     JSONObject data;
@@ -38,17 +50,74 @@ public class card_info extends AppCompatActivity  {
     String firstMessage;
     String scenario;
     String exampleMessages;
-    String userPersona;
     ArrayList<Card> cards = new ArrayList<>();
     EditCardAdapter editCardAdapter;
     TextInputLayout til_name;
     TextInputLayout til_summary;
+    ImageView image;
     TextInputLayout til_first_message;
     TextInputLayout til_scenario;
     TextInputLayout til_example;
     FrameLayout frameLayout;
     RecyclerView recyclerView;
+    LinearLayout linearLayout;
+    CircularProgressButton btn;
     boolean world;
+    ActivityResultLauncher<Intent> pickImage = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        // There are no request codes
+                        Intent data = result.getData();
+                        pfp = data.getData();
+                        image.setImageURI(pfp);
+                        try {
+                            MaterialAlertDialogBuilder alert = new MaterialAlertDialogBuilder(getBaseContext());
+                            alert.setTitle("Вы хотите импортировать данные из фото?");
+                            alert.setMessage("При сканировании фото были найдены данные. Импортировав их, вы потеряете все, что вы вписали");
+                            alert.setPositiveButton("Да",(dialog, which) -> {});
+                            alert.setNegativeButton("Нет",(dialog, which) -> {
+                                throw new PngjInputException("Ignore this");
+                            });
+                            alert.show();
+                            InputStream iStream =   getContentResolver().openInputStream(pfp);
+                            JSONObject jsonData = Utilities.getMetadataFromFile(iStream);
+                            til_name.getEditText().setText(jsonData.getString("name"));
+                            til_summary.getEditText().setText(jsonData.getString("description"));
+                            til_first_message.getEditText().setText(jsonData.getString("first_mes"));
+                            til_scenario.getEditText().setText(jsonData.getString("scenario"));
+                            til_example.getEditText().setText(jsonData.getString("mes_example"));
+                            ArrayList<Card> jsonCards = new ArrayList<>();
+                            try {
+                                jsonCards = Utilities.getCardsFromJsonList(getApplicationContext(),jsonData.getString("characters"));
+                            } catch (JSONException e){
+                                jsonCards = null;
+                            }
+                            if(jsonCards!=null){
+                                world = true;
+                                til_name.setHint("Имя");
+                                til_summary.setHint("Описание");
+                                linearLayout.setVisibility(View.GONE);
+                                cards = jsonCards;
+                            } else{
+                                world = false;
+                                til_name.setHint("Название");
+                                til_summary.setHint("Сюжет мира");
+                                linearLayout.setVisibility(View.VISIBLE);
+                            }
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        } catch (FileNotFoundException e) {
+                            throw new RuntimeException(e);
+                        } catch (PngjInputException e){
+                        }
+                        btn.setEnabled(pfp!=null&&!til_name.getEditText().getText().toString().isEmpty() && !til_summary.getEditText().getText().toString().isEmpty() && !til_first_message.getEditText().getText().toString().isEmpty());
+                    }
+                }
+            });
+    private static final int PERMISSION_CODE = 1001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,9 +133,9 @@ public class card_info extends AppCompatActivity  {
         til_scenario = findViewById(R.id.Scenario);
         til_example = findViewById(R.id.Primer);
         frameLayout = findViewById(R.id.btn_layout);
-        ImageView image = findViewById(R.id.image);
-        LinearLayout linearLayout = findViewById(R.id.worldGroup);
-        CircularProgressButton btn = findViewById(R.id.CreateButton);
+        image = findViewById(R.id.image);
+        linearLayout = findViewById(R.id.worldGroup);
+        btn = findViewById(R.id.CreateButton);
         ImageButton btn_edit = findViewById(R.id.edit);
         findViewById(R.id.cards);
         ImageButton btn_chat = findViewById(R.id.chat);
@@ -105,9 +174,33 @@ public class card_info extends AppCompatActivity  {
         til_scenario.getEditText().setText(scenario);
         til_example.getEditText().setText(exampleMessages);
         image.setImageURI(pfp);
+        image.setOnClickListener(v -> {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                if(checkSelfPermission(android.Manifest.permission.READ_MEDIA_IMAGES)== PackageManager.PERMISSION_DENIED){
+                    String[] permissions = new String[0];
+                    permissions = new String[]{android.Manifest.permission.READ_MEDIA_IMAGES};
+                    requestPermissions(permissions,PERMISSION_CODE);
+                } else{
+                    pickImageFromGallery();
+                }
+            } else{
+                if(checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_DENIED){
+                    String[] permissions = new String[0];
+                    permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
+                    requestPermissions(permissions,PERMISSION_CODE);
+                } else{
+                    pickImageFromGallery();
+                }
+            }
+        });
+        til_name.getEditText().setOnFocusChangeListener(this);
+        til_summary.getEditText().setOnFocusChangeListener(this);
+        til_first_message.getEditText().setOnFocusChangeListener(this);
+        til_scenario.getEditText().setOnFocusChangeListener(this);
+        til_example.getEditText().setOnFocusChangeListener(this);
         btn_chat.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), ViewChats.class);
-            intent.putExtra("name",name);
+            intent.putExtra("name",til_name.getEditText().toString());
             intent.putExtra("uri",pfp);
             intent.putExtra("data",data.toString());
             intent.putExtra("firstMessage",firstMessage);
@@ -122,11 +215,22 @@ public class card_info extends AppCompatActivity  {
             btn.startAnimation();
             Bitmap finalBitmap = Utilities.getContactBitmapFromURI(this,pfp);
             new File(pfp.getPath()).delete();
-            String metadata = Utilities.generateMetadata(this,til_summary,til_first_message,til_example,til_name,til_scenario,editCardAdapter.getAdded());
+            String metadata = "";
+            if(world){
+                metadata = Utilities.generateMetadata(this,til_summary,til_first_message,til_example,til_name,til_scenario,editCardAdapter.getAdded());
+                cards = editCardAdapter.getAdded();
+            } else{
+                metadata = Utilities.generateMetadata(this,til_summary,til_first_message,til_example,til_name,til_scenario,new ArrayList<Card>());
+            }
             Utilities.saveCard(this,finalBitmap,metadata,pfp.getLastPathSegment(),world,false);
-            cards = editCardAdapter.getAdded();
             toggleEdits();
         });
+    }
+
+    private void pickImageFromGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        pickImage.launch(intent);
     }
 
     @Override
@@ -151,6 +255,18 @@ public class card_info extends AppCompatActivity  {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case PERMISSION_CODE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    pickImageFromGallery();
+                } else {
+                    Toast.makeText(this, "Отказано в доступе", Toast.LENGTH_SHORT).show();
+                }
+        }
+    }
     public void toggleEdits(){
         boolean enable = !til_name.isEnabled();
         til_summary.setEnabled(enable);
@@ -173,5 +289,9 @@ public class card_info extends AppCompatActivity  {
             }
         }
         til_name.setEnabled(enable);
+    }
+    @Override
+    public void onFocusChange(View v, boolean hasFocus) {
+        btn.setEnabled(pfp!=null&&!til_name.getEditText().getText().toString().isEmpty() && !til_summary.getEditText().getText().toString().isEmpty() && !til_first_message.getEditText().getText().toString().isEmpty());
     }
 }
