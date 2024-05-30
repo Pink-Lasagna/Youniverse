@@ -37,11 +37,11 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         holder.description.setText(cards.get(position).description);
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), card_info.class);
-            intent.putExtra("name",cards.get(position).name);
-            intent.putExtra("uri",cards.get(position).uri);
-            intent.putExtra("data",cards.get(position).convertedData.toString());
+            intent.putExtra("name",cards.get(holder.getAdapterPosition()).name);
+            intent.putExtra("uri",cards.get(holder.getAdapterPosition()).uri);
+            intent.putExtra("data",cards.get(holder.getAdapterPosition()).convertedData.toString());
             intent.putExtra("userPersona","human");
-            intent.putExtra("world",cards.get(position).world);
+            intent.putExtra("world",cards.get(holder.getAdapterPosition()).world);
             v.getContext().startActivity(intent);
         });
     }
