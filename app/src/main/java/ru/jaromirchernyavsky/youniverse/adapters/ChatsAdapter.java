@@ -44,12 +44,16 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder>{
         holder.lastMessages.setLayoutManager(new LinearLayoutManager(holder.lastMessages.getContext()));
         holder.lastMessages.scrollToPosition(messages.get(position).size());
         holder.chat.setOnClickListener(v -> {
-            setPos(position);
+            setPos(holder.getAdapterPosition());
             onClickListener.onClick(v);
         });
         holder.delete.setOnClickListener(v -> {
-            messages.remove(holder.getAdapterPosition());
-            notifyItemRemoved(holder.getAdapterPosition());
+            try{
+                messages.remove(holder.getAdapterPosition());
+                notifyItemRemoved(holder.getAdapterPosition());
+            } catch (Exception ignore){
+            }
+
         });
     }
 
