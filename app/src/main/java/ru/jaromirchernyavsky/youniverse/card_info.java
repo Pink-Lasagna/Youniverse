@@ -17,6 +17,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -24,6 +25,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+import android.window.OnBackInvokedDispatcher;
 
 import com.github.leandroborgesferreira.loadingbutton.customViews.CircularProgressButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -74,21 +76,10 @@ public class card_info extends AppCompatActivity implements View.OnFocusChangeLi
                         pfp = data.getData();
                         image.setImageURI(pfp);
                         try {
-                            MaterialAlertDialogBuilder alert = new MaterialAlertDialogBuilder(getBaseContext());
-                            alert.setTitle("Вы хотите импортировать данные из фото?");
-                            alert.setMessage("При сканировании фото были найдены данные. Импортировав их, вы потеряете все, что вы вписали");
-                            alert.setPositiveButton("Да",(dialog, which) -> {});
-                            alert.setNegativeButton("Нет",(dialog, which) -> {
-                                throw new PngjInputException("Ignore this");
-                            });
-                            alert.show();
                             InputStream iStream =   getContentResolver().openInputStream(pfp);
                             JSONObject jsonData = Utilities.getMetadataFromFile(iStream);
-                            til_name.getEditText().setText(jsonData.getString("name"));
-                            til_summary.getEditText().setText(jsonData.getString("description"));
-                            til_first_message.getEditText().setText(jsonData.getString("first_mes"));
-                            til_scenario.getEditText().setText(jsonData.getString("scenario"));
-                            til_example.getEditText().setText(jsonData.getString("mes_example"));
+                            showDialog();
+                            setEdits(jsonData.getString("name"),jsonData.getString("description"),jsonData.getString("first_mes"),jsonData.getString("scenario"),jsonData.getString("mes_example"));
                             ArrayList<Card> jsonCards = new ArrayList<>();
                             try {
                                 jsonCards = Utilities.getCardsFromJsonList(getApplicationContext(),jsonData.getString("characters"));
@@ -140,6 +131,74 @@ public class card_info extends AppCompatActivity implements View.OnFocusChangeLi
         findViewById(R.id.cards);
         ImageButton btn_chat = findViewById(R.id.chat);
         recyclerView = findViewById(R.id.cards);
+        initEdits();
+        image.setOnClickListener(v -> {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                if(checkSelfPermission(android.Manifest.permission.READ_MEDIA_IMAGES)== PackageManager.PERMISSION_DENIED){
+                    String[] permissions = new String[0];
+                    permissions = new String[]{android.Manifest.permission.READ_MEDIA_IMAGES};
+                    requestPermissions(permissions,PERMISSION_CODE);
+                } else{
+                    pickImageFromGallery();
+                }
+            } else{
+                if(checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_DENIED){
+                    String[] permissions = new String[0];
+                    permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
+                    requestPermissions(permissions,PERMISSION_CODE);
+                } else{
+                    pickImageFromGallery();
+                }
+            }
+        });
+        til_name.getEditText().setOnFocusChangeListener(this);
+        til_summary.getEditText().setOnFocusChangeListener(this);
+        til_first_message.getEditText().setOnFocusChangeListener(this);
+        til_scenario.getEditText().setOnFocusChangeListener(this);
+        til_example.getEditText().setOnFocusChangeListener(this);
+        btn_chat.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), ViewChats.class);
+            intent.putExtra("name",name);
+            intent.putExtra("uri",pfp);
+            intent.putExtra("data",data.toString());
+            intent.putExtra("firstMessage",firstMessage);
+            intent.putExtra("userPersona","human");
+            intent.putExtra("world",world);
+            v.getContext().startActivity(intent);
+        });
+        btn_edit.setOnClickListener(v -> {
+            toggleEdits();
+        });
+        btn.setOnClickListener(v -> {
+            btn.startAnimation();
+            Bitmap finalBitmap = Utilities.getContactBitmapFromURI(this,pfp);
+            new File(pfp.getPath()).delete();
+            String metadata = "";
+            if(world){
+                metadata = Utilities.generateMetadata(this,til_summary,til_first_message,til_example,til_name,til_scenario,editCardAdapter.getAdded());
+                cards = editCardAdapter.getAdded();
+            } else{
+                metadata = Utilities.generateMetadata(this,til_summary,til_first_message,til_example,til_name,til_scenario,new ArrayList<Card>());
+            }
+            Utilities.saveCard(this,finalBitmap,metadata,pfp.getLastPathSegment(),world,true);
+            toggleEdits();
+        });
+    }
+
+    private void pickImageFromGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        pickImage.launch(intent);
+    }
+    private void setEdits(String name, String summary, String firstMessage, String scenario, String example){
+        til_name.getEditText().setText(name);
+        til_summary.getEditText().setText(summary);
+        til_first_message.getEditText().setText(firstMessage);
+        til_scenario.getEditText().setText(scenario);
+        til_example.getEditText().setText(example);
+    }
+
+    private void initEdits(){
         try {
             data = new JSONObject(getIntent().getStringExtra("data"));
             description = data.getString("description");
@@ -168,71 +227,9 @@ public class card_info extends AppCompatActivity implements View.OnFocusChangeLi
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-        til_name.getEditText().setText(name);
-        til_summary.getEditText().setText(description);
-        til_first_message.getEditText().setText(firstMessage);
-        til_scenario.getEditText().setText(scenario);
-        til_example.getEditText().setText(exampleMessages);
+        setEdits(name,description,firstMessage,scenario,exampleMessages);
         image.setImageURI(pfp);
-        image.setOnClickListener(v -> {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                if(checkSelfPermission(android.Manifest.permission.READ_MEDIA_IMAGES)== PackageManager.PERMISSION_DENIED){
-                    String[] permissions = new String[0];
-                    permissions = new String[]{android.Manifest.permission.READ_MEDIA_IMAGES};
-                    requestPermissions(permissions,PERMISSION_CODE);
-                } else{
-                    pickImageFromGallery();
-                }
-            } else{
-                if(checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_DENIED){
-                    String[] permissions = new String[0];
-                    permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
-                    requestPermissions(permissions,PERMISSION_CODE);
-                } else{
-                    pickImageFromGallery();
-                }
-            }
-        });
-        til_name.getEditText().setOnFocusChangeListener(this);
-        til_summary.getEditText().setOnFocusChangeListener(this);
-        til_first_message.getEditText().setOnFocusChangeListener(this);
-        til_scenario.getEditText().setOnFocusChangeListener(this);
-        til_example.getEditText().setOnFocusChangeListener(this);
-        btn_chat.setOnClickListener(v -> {
-            Intent intent = new Intent(v.getContext(), ViewChats.class);
-            intent.putExtra("name",til_name.getEditText().toString());
-            intent.putExtra("uri",pfp);
-            intent.putExtra("data",data.toString());
-            intent.putExtra("firstMessage",firstMessage);
-            intent.putExtra("userPersona","human");
-            intent.putExtra("world",world);
-            v.getContext().startActivity(intent);
-        });
-        btn_edit.setOnClickListener(v -> {
-            toggleEdits();
-        });
-        btn.setOnClickListener(v -> {
-            btn.startAnimation();
-            Bitmap finalBitmap = Utilities.getContactBitmapFromURI(this,pfp);
-            new File(pfp.getPath()).delete();
-            String metadata = "";
-            if(world){
-                metadata = Utilities.generateMetadata(this,til_summary,til_first_message,til_example,til_name,til_scenario,editCardAdapter.getAdded());
-                cards = editCardAdapter.getAdded();
-            } else{
-                metadata = Utilities.generateMetadata(this,til_summary,til_first_message,til_example,til_name,til_scenario,new ArrayList<Card>());
-            }
-            Utilities.saveCard(this,finalBitmap,metadata,pfp.getLastPathSegment(),world,false);
-            toggleEdits();
-        });
     }
-
-    private void pickImageFromGallery() {
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        pickImage.launch(intent);
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -243,6 +240,7 @@ public class card_info extends AppCompatActivity implements View.OnFocusChangeLi
                         .setTitle("Вы уверены, что хотите прекратить редактировать?")
                         .setMessage("Все изменения будут потеряны")
                         .setNegativeButton("Да",(dialog, which) -> {
+                            initEdits();
                             toggleEdits();
                         })
                         .setPositiveButton("Нет",(dialog, which) -> {
@@ -267,6 +265,17 @@ public class card_info extends AppCompatActivity implements View.OnFocusChangeLi
                 }
         }
     }
+
+    private void showDialog(){
+        MaterialAlertDialogBuilder alert = new MaterialAlertDialogBuilder(getBaseContext());
+        alert.setTitle("Вы хотите импортировать данные из фото?");
+        alert.setMessage("При сканировании фото были найдены данные. Импортировав их, вы потеряете все, что вы вписали");
+        alert.setPositiveButton("Да",(dialog, which) -> {});
+        alert.setNegativeButton("Нет",(dialog, which) -> {
+            throw new PngjInputException("Ignore this");
+        });
+        alert.show();
+    }
     public void toggleEdits(){
         boolean enable = !til_name.isEnabled();
         til_summary.setEnabled(enable);
@@ -290,6 +299,27 @@ public class card_info extends AppCompatActivity implements View.OnFocusChangeLi
         }
         til_name.setEnabled(enable);
     }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+            if(til_name.isEnabled()) {
+                new MaterialAlertDialogBuilder(this)
+                        .setTitle("Вы уверены, что хотите прекратить редактировать?")
+                        .setMessage("Все изменения будут потеряны")
+                        .setNegativeButton("Да", (dialog, which) -> {
+                            initEdits();
+                            toggleEdits();
+                        })
+                        .setPositiveButton("Нет", (dialog, which) -> {
+                        }).show();
+            }else{
+                getOnBackPressedDispatcher().onBackPressed();
+            }
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
         btn.setEnabled(pfp!=null&&!til_name.getEditText().getText().toString().isEmpty() && !til_summary.getEditText().getText().toString().isEmpty() && !til_first_message.getEditText().getText().toString().isEmpty());

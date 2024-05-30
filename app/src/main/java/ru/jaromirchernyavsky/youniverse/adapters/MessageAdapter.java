@@ -36,7 +36,6 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         if(holder.getItemViewType()!=2) {
             holder.message.setText(messages.get(position).getSpannable());
         }
-
     }
 
     @Override

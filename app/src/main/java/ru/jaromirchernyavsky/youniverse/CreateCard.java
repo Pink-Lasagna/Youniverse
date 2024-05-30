@@ -58,16 +58,9 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
                         imageuri = data.getData();
                         image.setImageURI(imageuri);
                         try {
-                            MaterialAlertDialogBuilder alert = new MaterialAlertDialogBuilder(getBaseContext());
-                            alert.setTitle("Вы хотите импортировать данные из фото?");
-                            alert.setMessage("При сканировании фото были найдены данные. Импортировав их, вы потеряете все, что вы вписали");
-                            alert.setPositiveButton("Да",(dialog, which) -> {});
-                            alert.setNegativeButton("Нет",(dialog, which) -> {
-                                throw new PngjInputException("Ignore this");
-                            });
-                            alert.show();
                             InputStream iStream =   getContentResolver().openInputStream(imageuri);
                             JSONObject jsonData = Utilities.getMetadataFromFile(iStream);
+                            showDialog();
                             name.getEditText().setText(jsonData.getString("name"));
                             summary.getEditText().setText(jsonData.getString("description"));
                             first_message.getEditText().setText(jsonData.getString("first_mes"));
@@ -187,7 +180,16 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
         intent.setType("image/*");
         pickImage.launch(intent);
     }
-
+    private void showDialog(){
+        MaterialAlertDialogBuilder alert = new MaterialAlertDialogBuilder(this);
+        alert.setTitle("Вы хотите импортировать данные из фото?");
+        alert.setMessage("При сканировании фото были найдены данные. Импортировав их, вы потеряете все, что вы вписали");
+        alert.setPositiveButton("Да",(dialog, which) -> {});
+        alert.setNegativeButton("Нет",(dialog, which) -> {
+            throw new PngjInputException("Ignore this");
+        });
+        alert.show();
+    }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

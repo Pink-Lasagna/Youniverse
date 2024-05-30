@@ -27,14 +27,9 @@ public class ViewChats extends AppCompatActivity implements View.OnClickListener
     String name;
     Uri pfp;
     String data;
-
-    String description;
     String firstMessage;
-    String scenario;
-    String exampleMessages;
     boolean world;
     String userPersona;
-    int chatid;
     String TAG;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +71,9 @@ public class ViewChats extends AppCompatActivity implements View.OnClickListener
         RecyclerView recyclerView = findViewById(R.id.recycle);
         recyclerView.setAdapter(chatsAdapter);
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        if(sharedPreferences.getAll().size()==0){
+            chatMessages.add(createStartMessage());
+        }
         super.onResume();
     }
 

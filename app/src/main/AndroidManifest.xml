@@ -18,7 +18,7 @@
         <activity
             android:name=".ViewChats"
             android:exported="false"
-            android:theme="@style/Theme.Youniverse.BackButton"/>
+            android:theme="@style/Theme.Youniverse.BackButton" />
         <activity
             android:name=".card_info"
             android:exported="false"
@@ -34,8 +34,7 @@
             android:theme="@style/Theme.Youniverse.BackButton" />
         <activity
             android:name=".MainActivity"
-            android:exported="true"
-            android:label="@string/app_name">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
