@@ -59,7 +59,11 @@ public class HomeFragment extends Fragment {
     public boolean onContextItemSelected(@NonNull MenuItem item) {
         switch (item.getOrder()){
             case 0:
-                Utilities.addImageToGallery(getContext(),cards.get(item.getItemId()).uri);
+                try {
+                    Utilities.addImageToGallery(getContext(),cards.get(item.getItemId()).uri);
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
                 break;
             case 1:
                 adapter.deleteCard(item.getGroupId());

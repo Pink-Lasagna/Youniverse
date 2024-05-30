@@ -1,21 +1,13 @@
 package ru.jaromirchernyavsky.youniverse;
 
-import static android.os.Build.VERSION.SDK_INT;
-
 import android.app.Activity;
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Base64;
-
-import androidx.annotation.RequiresApi;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
@@ -235,6 +227,15 @@ public class Utilities {
         return data;
     }
 
+    public static JSONObject getFullMetadataFromFile(String filePath) throws JSONException {
+        File file = new File(filePath);
+        PngReader pngr = new PngReader(file);
+        String result = pngr.getMetadata().getTxtForKey("chara");
+        JSONObject data = new JSONObject(new String(Base64.decode(result, Base64.DEFAULT)));
+        pngr.close();
+        return data;
+    }
+
     public static String getStringJsonfromCards(ArrayList<Card> cards){
         String chars = "";
         if(cards.isEmpty()) return "";
@@ -284,57 +285,76 @@ public class Utilities {
                         "Ты должен генерировать действия существ, находящихся в мире \"%s\", и описывать последствия действий персонажа \"%s\". Также ты должен вкратце и детализировано описывать сцену вокруг пользователя в данный момент, используя яркие эпитеты и образы. Генерируй речь существ и персонажей, которых встречает пользователь, придавая им уникальные голоса и характерные черты. Обособляй все описания и действия звездочками *, кроме прямой речи персонажей.",
                 name, username, userPersona, description, scenario, exampleMessages, name, username));
     }
-    public static void addImageToGallery(Context context, Uri conturi) {
-        Bitmap bitmap = getContactBitmapFromURI(context,conturi);
-        if (SDK_INT >= Build.VERSION_CODES.Q) {
-            try {
-                final ContentValues values = new ContentValues();
-                values.put(MediaStore.MediaColumns.DISPLAY_NAME, conturi.getLastPathSegment().replace(".png",Long.toString(System.currentTimeMillis())));
-                values.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
-                values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
-                System.out.println(Environment.DIRECTORY_PICTURES);
-                final ContentResolver resolver = context.getContentResolver();
-                Uri uri = null;
-                try {
-                    final Uri contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                    uri = resolver.insert(contentUri, values);
-                    if (uri == null) {
-                        //isSuccess = false;
-                        throw new IOException("Failed to create new MediaStore record.");
-                    }
-                    try (final OutputStream stream = resolver.openOutputStream(uri)) {
-                        if (stream == null) {
-                            //isSuccess = false;
-                            throw new IOException("Failed to open output stream.");
-                        }
-                        if (!bitmap.compress(Bitmap.CompressFormat.PNG, 95, stream)) {
-                            //isSuccess = false;
-                            throw new IOException("Failed to save bitmap.");
-                        }
-                    }
-                    //isSuccess = true;
-                } catch (IOException e) {
-                    if (uri != null) {
-                        resolver.delete(uri, null, null);
-                    }
-                    throw e;
-                }
-            } catch (Exception e) {
-                //show error to user that operatoin failed
-            }
-        } else {
-            OutputStream fos;
-            String imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
-            File image = new File(imagesDir, conturi.getLastPathSegment().replace(".png", System.currentTimeMillis() +".png"));
-            try {
-                fos = new FileOutputStream(image);
-                bitmap.compress(Bitmap.CompressFormat.PNG, 95, fos);
-                Objects.requireNonNull(fos).close();
-            } catch (IOException e) {
-                e.printStackTrace();
-                //isSuccess = false;
-            }
-            //isSuccess = true;
+    public static void addImageToGallery(Context context, Uri conturi) throws JSONException {
+        Bitmap bitmap = getContactBitmapFromURI(context, conturi);
+//        if (SDK_INT >= Build.VERSION_CODES.Q) {
+//            try {
+//                final ContentValues values = new ContentValues();
+//                values.put(MediaStore.MediaColumns.DISPLAY_NAME, conturi.getLastPathSegment().replace(".png",Long.toString(System.currentTimeMillis())));
+//                values.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
+//                values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
+//                System.out.println(Environment.DIRECTORY_PICTURES);
+//                final ContentResolver resolver = context.getContentResolver();
+//                Uri uri = null;
+//                try {
+//                    final Uri contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+//                    uri = resolver.insert(contentUri, values);
+//                    if (uri == null) {
+//                        //isSuccess = false;
+//                        throw new IOException("Failed to create new MediaStore record.");
+//                    }
+//                    try (final OutputStream stream = resolver.openOutputStream(uri)) {
+//                        if (stream == null) {
+//                            //isSuccess = false;
+//                            throw new IOException("Failed to open output stream.");
+//                        }
+//                        if (!bitmap.compress(Bitmap.CompressFormat.PNG, 95, stream)) {
+//                            //isSuccess = false;
+//                            throw new IOException("Failed to save bitmap.");
+//                        }
+//                    }
+//                    //isSuccess = true;
+//                } catch (IOException e) {
+//                    if (uri != null) {
+//                        resolver.delete(uri, null, null);
+//                    }
+//                    throw e;
+//                }
+//            } catch (Exception e) {
+//                //show error to user that operatoin failed
+//            }
+//        } else {
+        OutputStream fos;
+        String imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
+        String name = conturi.getLastPathSegment().replace(".png", Long.toString(System.currentTimeMillis()));
+        File image = new File(imagesDir,  name + ".png");
+        try {
+            fos = new FileOutputStream(image);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 95, fos);
+            Objects.requireNonNull(fos).close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        File destFile = new File(imagesDir, name + "1.png");
+        PngReader pngr = new PngReader(image);
+        PngWriter pngw = new PngWriter(destFile, pngr.imgInfo, true);
+        PngChunkTextVar pngctv = new PngChunkTEXT(pngr.imgInfo);
+        String base64 = Base64.encodeToString(getFullMetadataFromFile(conturi.getPath()).toString().getBytes(), Base64.CRLF);
+        pngctv.setKeyVal("chara", base64);
+        pngctv.setPriority(true);
+        pngw.getMetadata().queueChunk(pngctv);
+        pngw.copyChunksFrom(pngr.getChunksList(), ChunkCopyBehaviour.COPY_TEXTUAL);
+        for (int row = 0; row < pngr.imgInfo.rows; row++) {
+            IImageLine l1 = pngr.readRow();
+            pngw.writeRow(l1);
+        }
+        pngr.end();
+        pngw.end();
+        image.delete();
+        try {
+            renameFile(destFile.toString(), name + ".png");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

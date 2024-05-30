@@ -60,38 +60,44 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
                         try {
                             InputStream iStream =   getContentResolver().openInputStream(imageuri);
                             JSONObject jsonData = Utilities.getMetadataFromFile(iStream);
-                            showDialog();
-                            name.getEditText().setText(jsonData.getString("name"));
-                            summary.getEditText().setText(jsonData.getString("description"));
-                            first_message.getEditText().setText(jsonData.getString("first_mes"));
-                            scenario.getEditText().setText(jsonData.getString("scenario"));
-                            example.getEditText().setText(jsonData.getString("mes_example"));
-                            ArrayList<Card> jsonCards = new ArrayList<>();
-                            try {
-                                jsonCards = Utilities.getCardsFromJsonList(getApplicationContext(),jsonData.getString("characters"));
-                            } catch (JSONException e){
-                                jsonCards = null;
-                            }
-                            if(jsonCards!=null){
-                                materialSwitch.setChecked(true);
-                                world = true;
-                                name.setHint("Название");
-                                summary.setHint("Сюжет мира");
-                                worldlayout.setVisibility(View.VISIBLE);
-                                cards = jsonCards;
-                            } else{
-                                materialSwitch.setChecked(false);
-                                world = false;
-                                name.setHint("Имя");
-                                summary.setHint("Описание");
-                                worldlayout.setVisibility(View.GONE);
-                            }
-                            materialSwitch.setClickable(false);
-                        } catch (JSONException e) {
+                            MaterialAlertDialogBuilder alertDialogBuilder = alertDialog();
+                            alertDialogBuilder.setPositiveButton("Да",(dialog, which) -> {
+                                try {
+                                    name.getEditText().setText(jsonData.getString("name"));
+                                summary.getEditText().setText(jsonData.getString("description"));
+                                first_message.getEditText().setText(jsonData.getString("first_mes"));
+                                scenario.getEditText().setText(jsonData.getString("scenario"));
+                                example.getEditText().setText(jsonData.getString("mes_example"));
+                                ArrayList<Card> jsonCards = new ArrayList<>();
+                                try {
+                                    jsonCards = Utilities.getCardsFromJsonList(getApplicationContext(),jsonData.getString("characters"));
+                                } catch (JSONException e){
+                                    jsonCards = null;
+                                }
+                                if(jsonCards.size()==0) jsonCards=null;
+                                if(jsonCards!=null){
+                                    materialSwitch.setChecked(true);
+                                    world = true;
+                                    name.setHint("Название");
+                                    summary.setHint("Сюжет мира");
+                                    worldlayout.setVisibility(View.VISIBLE);
+                                    cards = jsonCards;
+                                } else{
+                                    materialSwitch.setChecked(false);
+                                    world = false;
+                                    name.setHint("Имя");
+                                    summary.setHint("Описание");
+                                    worldlayout.setVisibility(View.GONE);
+                                }
+                                materialSwitch.setClickable(false);
+                                } catch (JSONException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            });
+                            alertDialogBuilder.show();
+                        } catch (JSONException | FileNotFoundException e) {
                             throw new RuntimeException(e);
-                        } catch (FileNotFoundException e) {
-                            throw new RuntimeException(e);
-                        } catch (PngjInputException e){
+                        } catch (PngjInputException ignored){
                         }
 
                         btn.setEnabled(imageuri!=null&&!name.getEditText().getText().toString().isEmpty() && !summary.getEditText().getText().toString().isEmpty() && !first_message.getEditText().getText().toString().isEmpty());
@@ -180,15 +186,12 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
         intent.setType("image/*");
         pickImage.launch(intent);
     }
-    private void showDialog(){
+    private MaterialAlertDialogBuilder alertDialog(){
         MaterialAlertDialogBuilder alert = new MaterialAlertDialogBuilder(this);
         alert.setTitle("Вы хотите импортировать данные из фото?");
         alert.setMessage("При сканировании фото были найдены данные. Импортировав их, вы потеряете все, что вы вписали");
-        alert.setPositiveButton("Да",(dialog, which) -> {});
-        alert.setNegativeButton("Нет",(dialog, which) -> {
-            throw new PngjInputException("Ignore this");
-        });
-        alert.show();
+        alert.setNegativeButton("Нет",(dialog, which) -> {});
+        return alert;
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
