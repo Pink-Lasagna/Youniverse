@@ -33,10 +33,12 @@
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:background="@color/red"
+                    style="?selectableItemBackground"
                     android:src="@drawable/baseline_delete_24"/>
                 <ImageButton
                     android:id="@+id/chat"
                     android:padding="3dp"
+                    style="?selectableItemBackground"
                     android:layout_weight="1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
