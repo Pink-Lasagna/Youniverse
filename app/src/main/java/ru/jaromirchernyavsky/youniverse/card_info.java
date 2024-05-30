@@ -78,26 +78,34 @@ public class card_info extends AppCompatActivity implements View.OnFocusChangeLi
                         try {
                             InputStream iStream =   getContentResolver().openInputStream(pfp);
                             JSONObject jsonData = Utilities.getMetadataFromFile(iStream);
-                            showDialog();
-                            setEdits(jsonData.getString("name"),jsonData.getString("description"),jsonData.getString("first_mes"),jsonData.getString("scenario"),jsonData.getString("mes_example"));
-                            ArrayList<Card> jsonCards = new ArrayList<>();
-                            try {
-                                jsonCards = Utilities.getCardsFromJsonList(getApplicationContext(),jsonData.getString("characters"));
-                            } catch (JSONException e){
-                                jsonCards = null;
-                            }
-                            if(jsonCards!=null){
-                                world = true;
-                                til_name.setHint("Имя");
-                                til_summary.setHint("Описание");
-                                linearLayout.setVisibility(View.GONE);
-                                cards = jsonCards;
-                            } else{
-                                world = false;
-                                til_name.setHint("Название");
-                                til_summary.setHint("Сюжет мира");
-                                linearLayout.setVisibility(View.VISIBLE);
-                            }
+                            MaterialAlertDialogBuilder alert = showDialog();
+                            alert.setPositiveButton("Да",(dialog, which) -> {
+                                try {
+                                    setEdits(jsonData.getString("name"),jsonData.getString("description"),jsonData.getString("first_mes"),jsonData.getString("scenario"),jsonData.getString("mes_example"));
+                                } catch (JSONException e) {
+                                    throw new RuntimeException(e);
+                                }
+                                ArrayList<Card> jsonCards = new ArrayList<>();
+                                try {
+                                    jsonCards = Utilities.getCardsFromJsonList(getApplicationContext(),jsonData.getString("characters"));
+                                } catch (JSONException e){
+                                    jsonCards = null;
+                                }
+                                if(jsonCards.size()==0) jsonCards=null;
+                                if(jsonCards!=null){
+                                    world = true;
+                                    til_name.setHint("Имя");
+                                    til_summary.setHint("Описание");
+                                    linearLayout.setVisibility(View.GONE);
+                                    cards = jsonCards;
+                                } else{
+                                    world = false;
+                                    til_name.setHint("Название");
+                                    til_summary.setHint("Сюжет мира");
+                                    linearLayout.setVisibility(View.VISIBLE);
+                                }
+                            });
+                            alert.show();
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
                         } catch (FileNotFoundException e) {
@@ -266,15 +274,12 @@ public class card_info extends AppCompatActivity implements View.OnFocusChangeLi
         }
     }
 
-    private void showDialog(){
+    private MaterialAlertDialogBuilder showDialog(){
         MaterialAlertDialogBuilder alert = new MaterialAlertDialogBuilder(getBaseContext());
         alert.setTitle("Вы хотите импортировать данные из фото?");
         alert.setMessage("При сканировании фото были найдены данные. Импортировав их, вы потеряете все, что вы вписали");
-        alert.setPositiveButton("Да",(dialog, which) -> {});
-        alert.setNegativeButton("Нет",(dialog, which) -> {
-            throw new PngjInputException("Ignore this");
-        });
-        alert.show();
+        alert.setNegativeButton("Нет",(dialog, which) -> {});
+        return alert;
     }
     public void toggleEdits(){
         boolean enable = !til_name.isEnabled();
