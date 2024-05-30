@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
@@ -81,16 +82,16 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
                             if(jsonCards!=null){
                                 materialSwitch.setChecked(true);
                                 world = true;
-                                name.setHint("Имя");
-                                summary.setHint("Описание");
-                                worldlayout.setVisibility(View.GONE);
+                                name.setHint("Название");
+                                summary.setHint("Сюжет мира");
+                                worldlayout.setVisibility(View.VISIBLE);
                                 cards = jsonCards;
                             } else{
                                 materialSwitch.setChecked(false);
                                 world = false;
-                                name.setHint("Название");
-                                summary.setHint("Сюжет мира");
-                                worldlayout.setVisibility(View.VISIBLE);
+                                name.setHint("Имя");
+                                summary.setHint("Описание");
+                                worldlayout.setVisibility(View.GONE);
                             }
                             materialSwitch.setClickable(false);
                         } catch (JSONException e) {
@@ -162,6 +163,11 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
         worldlayout = findViewById(R.id.worldGroup);
         recyclerView.setLayoutManager(linearLayoutManager);
         EditCardAdapter editCardAdapter = new EditCardAdapter(new ArrayList<Card>(),cards);
+        TextView morecards = findViewById(R.id.MoreCards);
+        if(cards.isEmpty()){
+            recyclerView.setVisibility(View.GONE);
+            morecards.setVisibility(View.VISIBLE);
+        }
         recyclerView.setAdapter(editCardAdapter);
         materialSwitch = findViewById(R.id.switchView);
         btn = findViewById(R.id.CreateButton);

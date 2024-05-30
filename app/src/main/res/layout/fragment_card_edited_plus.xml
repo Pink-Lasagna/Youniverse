@@ -36,6 +36,7 @@
                     android:layout_width="50dp"
                     android:layout_height="match_parent"
                     android:src="@drawable/baseline_add_24"
+                    style="?selectableItemBackground"
                     android:background="@color/green" />
             </LinearLayout>
 
