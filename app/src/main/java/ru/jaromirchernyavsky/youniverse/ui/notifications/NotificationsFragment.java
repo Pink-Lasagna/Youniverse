@@ -62,6 +62,7 @@ public class NotificationsFragment extends Fragment {
     public boolean onContextItemSelected(@NonNull MenuItem item) {
         switch (item.getOrder()){
             case 0:
+                Utilities.addImageToGallery(getContext(),cards.get(item.getItemId()).uri);
                 break;
             case 1:
                 adapter.deleteCard(item.getGroupId());
