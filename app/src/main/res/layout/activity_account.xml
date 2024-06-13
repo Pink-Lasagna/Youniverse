@@ -62,7 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:hint="Вашм общие черты"
+            android:hint="Ваши общие черты"
             tools:ignore="HardcodedText">
 
             <com.google.android.material.textfield.TextInputEditText
