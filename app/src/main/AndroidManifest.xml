@@ -16,6 +16,10 @@
         android:theme="@style/AppTheme"
         tools:targetApi="31">
         <activity
+            android:name=".Account"
+            android:theme="@style/Theme.Youniverse.BackButton"
+            android:exported="false" />
+        <activity
             android:name=".ViewChats"
             android:exported="false"
             android:theme="@style/Theme.Youniverse.BackButton" />
@@ -30,7 +34,6 @@
         <activity
             android:name=".CreateCard"
             android:exported="false"
-            android:label="@string/title_activity_create_card"
             android:theme="@style/Theme.Youniverse.BackButton" />
         <activity
             android:name=".MainActivity"

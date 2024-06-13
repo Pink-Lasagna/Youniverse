@@ -15,7 +15,7 @@ import ru.jaromirchernyavsky.youniverse.Card;
 import ru.jaromirchernyavsky.youniverse.R;
 
 public class WorldCardAdapter extends RecyclerView.Adapter<WorldCardAdapter.ViewHolder>{
-    private ArrayList<Card> cards;
+    private final ArrayList<Card> cards;
     public WorldCardAdapter(ArrayList<Card> cards){
         this.cards = cards;
     }
@@ -39,8 +39,8 @@ public class WorldCardAdapter extends RecyclerView.Adapter<WorldCardAdapter.View
 
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageView imageView;
-        public TextView name;
+        public final ImageView imageView;
+        public final TextView name;
 
         public ViewHolder(View itemView) {
             super(itemView);

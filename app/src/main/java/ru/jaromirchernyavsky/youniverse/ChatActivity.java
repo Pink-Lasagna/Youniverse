@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,25 +16,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.text.StringEscapeUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.StringWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -52,10 +44,8 @@ public class ChatActivity extends AppCompatActivity {
 
     String description;
     EditText editTxt;
-    String firstMessage;
     String scenario;
     String exampleMessages;
-    String userPersona;
     RecyclerView recyclerView;
     int chatid;
     String sys_prompt;
@@ -70,37 +60,35 @@ public class ChatActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.cards);
 
         try {
-            data = new JSONObject(getIntent().getStringExtra("data"));
+            data = new JSONObject(Objects.requireNonNull(getIntent().getStringExtra("data")));
             description = data.getString("description");
             scenario = data.getString("scenario");
             chatid = getIntent().getIntExtra("chatid",0);
             name = getIntent().getStringExtra("name");
             pfp = getIntent().getParcelableExtra("uri");
             exampleMessages = data.getString("mes_example");
-            userPersona = getIntent().getStringExtra("userPersona");
             world = getIntent().getBooleanExtra("world",false);
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
         TAG = pfp.toString().substring(pfp.toString().lastIndexOf("/")+1);
         String username = Utilities.getName(this);
+        String description = Utilities.getDescription(this);
         if(world){
-            sys_prompt = Utilities.worldSysPrompt(name,description,scenario,exampleMessages,username,"");
+            sys_prompt = Utilities.worldSysPrompt(name,description,scenario,exampleMessages,username,description);
         } else{
-            sys_prompt = Utilities.charSysPrompt(name,description,scenario,exampleMessages,username,"");
+            sys_prompt = Utilities.charSysPrompt(name,description,scenario,exampleMessages,username,description);
         }
 
         messages = Utilities.getStoredMessages(this,TAG,chatid);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);
-        messageAdapter = new MessageAdapter(messages);
+        messageAdapter = new MessageAdapter(messages, true);
         recyclerView.setAdapter(messageAdapter);
         nametv.setText(name);
         imageView.setImageURI(pfp);
-        findViewById(R.id.back).setOnClickListener(v -> {
-            this.finish();
-        });
+        findViewById(R.id.back).setOnClickListener(v -> this.finish());
         findViewById(R.id.send).setOnClickListener(v -> {
             if(!editTxt.getText().toString().isEmpty())sendMessage(editTxt.getText().toString());
             generateMessage();
@@ -117,7 +105,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void generateMessage(){
         if(checkSelfPermission(Manifest.permission.INTERNET)== PackageManager.PERMISSION_DENIED){
-            String[] permissions = new String[0];
+            String[] permissions;
             permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
             requestPermissions(permissions,PERMISSION_CODE);
         } else{
@@ -145,10 +133,6 @@ public class ChatActivity extends AppCompatActivity {
                     writer.write(body);
                     writer.flush();
                     writer.close();
-//                    InputStream error = connection.getErrorStream();
-//                    StringWriter tempwriter = new StringWriter();
-//                    IOUtils.copy(error,tempwriter,"UTF-8");
-//                    System.out.println(tempwriter.toString());
                     BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                     String line;
 
@@ -157,7 +141,7 @@ public class ChatActivity extends AppCompatActivity {
                         int start = line.indexOf("content")+ 10;
 
                         int end = line.indexOf("\"", start);
-                        String finresponse = "";
+                        String finresponse;
                         if(start==9||end==-1){
                             finresponse = "";
                         }else {
@@ -172,10 +156,6 @@ public class ChatActivity extends AppCompatActivity {
 
                     }
                     br.close();
-                } catch (ProtocolException e) {
-                    throw new RuntimeException(e);
-                } catch (MalformedURLException e) {
-                    throw new RuntimeException(e);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -193,12 +173,11 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case PERMISSION_CODE:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                } else {
-                    Toast.makeText(this, "Отказано в доступе", Toast.LENGTH_SHORT).show();
-                }
+        if (requestCode == PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            } else {
+                Toast.makeText(this, "Отказано в доступе", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

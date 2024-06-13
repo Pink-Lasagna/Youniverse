@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.icu.lang.UCharacter;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
@@ -18,6 +18,7 @@ import android.view.View;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 
 import ru.jaromirchernyavsky.youniverse.adapters.ChatsAdapter;
 
@@ -29,7 +30,6 @@ public class ViewChats extends AppCompatActivity implements View.OnClickListener
     String data;
     String firstMessage;
     boolean world;
-    String userPersona;
     String TAG;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,10 +40,10 @@ public class ViewChats extends AppCompatActivity implements View.OnClickListener
         pfp = getIntent().getParcelableExtra("uri");
         world = getIntent().getBooleanExtra("world",false);
         firstMessage = getIntent().getStringExtra("firstMessage");
-        userPersona = getIntent().getStringExtra("userPersona");
         TAG = pfp.toString().substring(pfp.toString().lastIndexOf("/") + 1);
         ActionBar bar = getSupportActionBar();
-        bar.setDisplayShowTitleEnabled(false);
+        Objects.requireNonNull(bar).setDisplayShowTitleEnabled(false);
+        bar.setBackgroundDrawable(new ColorDrawable(getColor(R.color.main)));
         bar.setDisplayHomeAsUpEnabled(true);
         bar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_new_24);
     }
@@ -60,10 +60,10 @@ public class ViewChats extends AppCompatActivity implements View.OnClickListener
         chatMessages=new ArrayList<>();
         SharedPreferences sharedPreferences = getSharedPreferences(TAG, 0);
         for (int i = 0; i < sharedPreferences.getAll().size(); i++) {
-            chatMessages.add(new ArrayList<ChatMessage>());
+            chatMessages.add(new ArrayList<>());
         }
         for (Map.Entry<String, ?> entry : sharedPreferences.getAll().entrySet()) {
-            int index = Integer.parseInt(entry.getKey().toString());
+            int index = Integer.parseInt(entry.getKey());
             ArrayList<ChatMessage> value = Utilities.getStoredMessages(this, TAG, index);
             chatMessages.set(index, value);
         }
@@ -87,7 +87,7 @@ public class ViewChats extends AppCompatActivity implements View.OnClickListener
         return super.onOptionsItemSelected(item);
     }
     public ArrayList<ChatMessage> createStartMessage(){
-        ArrayList<ChatMessage> defchat = new ArrayList<ChatMessage>();
+        ArrayList<ChatMessage> defchat = new ArrayList<>();
         defchat.add(new ChatMessage("assistant",firstMessage));
         chatsAdapter.notifyItemInserted(chatMessages.size());
         return defchat;

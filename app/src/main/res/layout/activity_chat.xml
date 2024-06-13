@@ -27,10 +27,9 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
-            android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/material_dynamic_neutral_variant10"
+            android:background="@color/main"
             android:padding="10dp">
 
             <ImageButton
@@ -41,7 +40,9 @@
                 android:background="@null"
                 android:minWidth="60dp"
                 android:minHeight="60dp"
-                android:src="@drawable/baseline_arrow_back_ios_new_24" />
+                android:src="@drawable/baseline_arrow_back_ios_new_24"
+                android:contentDescription="Назад"
+                tools:ignore="HardcodedText" />
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/pfp"
@@ -58,10 +59,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
                 android:text="Name"
                 android:textAlignment="center"
-                android:textSize="20dp" />
+                android:textSize="20sp"
+                tools:ignore="HardcodedText" />
 
 
         </LinearLayout>
@@ -72,7 +74,7 @@
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/material_dynamic_neutral_variant10"
+        android:background="@color/main"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -81,7 +83,7 @@
         <EditText
             android:id="@+id/edit"
             style="@style/Widget.Material3.TextInputEditText.OutlinedBox"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
@@ -90,19 +92,23 @@
             android:imeOptions="actionSend"
             android:inputType="textMultiLine"
             android:outlineProvider="background"
-            android:singleLine="false" />
+            android:singleLine="false"
+            tools:ignore="HardcodedText"
+            android:importantForAutofill="no" />
 
         <ImageButton
             android:id="@+id/send"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right|bottom"
+            android:layout_gravity="end|bottom"
             android:layout_margin="6dp"
             android:background="@null"
             android:backgroundTint="@color/cardview_dark_background"
             android:minWidth="45dp"
             android:minHeight="45dp"
-            android:src="@drawable/send" />
+            android:src="@drawable/send"
+            android:contentDescription="Отправить"
+            tools:ignore="HardcodedText" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

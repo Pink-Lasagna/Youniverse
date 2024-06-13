@@ -7,7 +7,6 @@
     tools:context=".CreateCard">
 
     <ScrollView
-        android:id="@+id/scrollView3"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="10dp"
@@ -44,14 +43,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
                     android:enabled="false"
                     android:hint="Имя"
                     app:counterEnabled="true"
                     app:counterMaxLength="20"
                     app:helperText="* Обязательное поле"
                     app:helperTextEnabled="true"
-                    app:helperTextTextColor="#FF1744">
+                    app:helperTextTextColor="#FF1744"
+                    tools:ignore="HardcodedText">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
@@ -69,7 +69,8 @@
                 android:hint="Общие черты"
                 app:helperText="* Обязательное поле"
                 app:helperTextEnabled="true"
-                app:helperTextTextColor="#FF1744">
+                app:helperTextTextColor="#FF1744"
+                tools:ignore="HardcodedText">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -86,7 +87,8 @@
                 android:hint="Приветствие"
                 app:helperText="* Обязательное поле"
                 app:helperTextEnabled="true"
-                app:helperTextTextColor="#FF1744">
+                app:helperTextTextColor="#FF1744"
+                tools:ignore="HardcodedText">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -100,7 +102,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:enabled="false"
-                android:hint="Сценарий">
+                android:hint="Сценарий"
+                tools:ignore="HardcodedText">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -114,7 +117,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:enabled="false"
-                android:hint="Пример сообщений">
+                android:hint="Пример сообщений"
+                tools:ignore="HardcodedText">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -131,11 +135,11 @@
                 android:visibility="gone">
 
                 <TextView
-                    android:id="@+id/textView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Добавленные персонажи:"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    tools:ignore="HardcodedText" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/cards"
@@ -152,7 +156,7 @@
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:background="@color/material_dynamic_neutral10"
+        android:background="@color/main"
         android:divider="@drawable/horiz_divider"
         android:orientation="horizontal"
         android:showDividers="middle"
@@ -167,7 +171,9 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:background="@null"
-            android:src="@drawable/pencil" />
+            android:src="@drawable/pencil"
+            android:contentDescription="Редактировать карточку"
+            tools:ignore="HardcodedText" />
 
         <ImageButton
             android:id="@+id/chat"
@@ -176,7 +182,9 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:background="@null"
-            android:src="@drawable/message" />
+            android:src="@drawable/message"
+            android:contentDescription="Чаты"
+            tools:ignore="HardcodedText" />
 
     </LinearLayout>
 
@@ -184,7 +192,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:id="@+id/btn_layout"
-        android:background="@color/material_dynamic_neutral10"
+        android:background="@color/main"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -196,11 +204,12 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_gravity="center"
-            android:background="@color/material_dynamic_neutral10"
+            android:background="@color/main"
             android:text="Сохранить"
             android:textStyle="bold"
             app:spinning_bar_color="@color/white"
-            app:spinning_bar_padding="5dp" />
+            app:spinning_bar_padding="5dp"
+            tools:ignore="HardcodedText" />
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,7 +5,6 @@
     android:layout_height="wrap_content">
     <com.google.android.material.card.MaterialCardView
         android:layout_width="160dp"
-        android:id="@+id/card"
         android:layout_height="wrap_content"
         style="?attr/materialCardViewElevatedStyle"
         android:layout_margin="8dp"
@@ -22,12 +21,13 @@
 
                 <TextView
                     android:id="@+id/name"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:padding="10dp"
                     android:text="Пример"
-                    android:textAppearance="?attr/textAppearanceTitleMedium" />
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    tools:ignore="HardcodedText" />
 
             </LinearLayout>
 
@@ -38,7 +38,7 @@
                 android:layout_height="85dp"
                 android:src="@drawable/ic_launcher_background"
                 android:scaleType="centerCrop"
-                />
+                android:importantForAccessibility="no" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </FrameLayout>

@@ -15,37 +15,35 @@ import ru.jaromirchernyavsky.youniverse.ChatMessage;
 import ru.jaromirchernyavsky.youniverse.R;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
-    ArrayList<ChatMessage> messages;
-    public MessageAdapter(ArrayList<ChatMessage> messages){
+    final ArrayList<ChatMessage> messages;
+    final boolean clickable;
+    public MessageAdapter(ArrayList<ChatMessage> messages, boolean clickable){
         this.messages = messages;
+        this.clickable = clickable;
     }
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = new View(parent.getContext());
+        View v;
         if (viewType == 1) {
             v = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_message_sent, parent, false);
         } else {
             v = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_message_recieved, parent, false);
         }
-        return new ViewHolder(v);
+        return new ViewHolder(v, clickable);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        if(holder.getItemViewType()!=2) {
-            holder.message.setText(messages.get(position).getSpannable());
-        }
+        holder.message.setText(messages.get(position).getSpannable());
     }
 
     @Override
     public int getItemViewType(int position) {
-        switch (messages.get(position).getRole()){
-            case "user":
-                return 1;
-            default:
-                return 0;
+        if (messages.get(position).getRole().equals("user")) {
+            return 1;
         }
+        return 0;
     }
 
     @Override
@@ -54,12 +52,12 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
-        public TextView message;
+        public final TextView message;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(View itemView, boolean clicklable) {
             super(itemView);
             message = itemView.findViewById(R.id.message);
-            itemView.setOnCreateContextMenuListener(this);
+            if(clicklable) itemView.setOnCreateContextMenuListener(this);
         }
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {

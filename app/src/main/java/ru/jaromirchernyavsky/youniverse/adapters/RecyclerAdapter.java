@@ -1,5 +1,6 @@
 package ru.jaromirchernyavsky.youniverse.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -46,6 +47,12 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         });
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    public void updateList(ArrayList<Card> list){
+        cards = list;
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemCount() {
         return cards.size();
@@ -53,9 +60,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
 
     static class ViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener{
-        public ImageView imageView;
-        public TextView name;
-        public TextView description;
+        public final ImageView imageView;
+        public final TextView name;
+        public final TextView description;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -72,6 +79,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         }
     }
 
+    /** @noinspection ResultOfMethodCallIgnored*/
     public void deleteCard(int pos) {
         new File(cards.get(pos).uri.toString().substring(8)).delete();
         cards.remove(pos);

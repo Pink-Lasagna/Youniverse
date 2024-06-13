@@ -2,7 +2,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <com.google.android.material.card.MaterialCardView
         android:layout_width="180dp"
 
@@ -20,7 +21,7 @@
                 android:id="@+id/recycler"
                 android:layout_width="match_parent"
                 android:layout_height="180dp"
-                android:clickable="true"
+                android:clickable="false"
                 tools:listitem="@layout/chat_message_recieved"/>
             <LinearLayout
                 android:layout_width="match_parent"
@@ -34,7 +35,9 @@
                     android:layout_height="wrap_content"
                     android:background="@color/red"
                     style="?selectableItemBackground"
-                    android:src="@drawable/baseline_delete_24"/>
+                    android:src="@drawable/baseline_delete_24"
+                    android:contentDescription="Удалить чат"
+                    tools:ignore="HardcodedText" />
                 <ImageButton
                     android:id="@+id/chat"
                     android:padding="3dp"
@@ -42,8 +45,10 @@
                     android:layout_weight="1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/material_dynamic_neutral20"
-                    android:src="@drawable/message"/>
+                    android:background="@color/main"
+                    android:src="@drawable/message"
+                    android:contentDescription="Перейти в чат"
+                    tools:ignore="HardcodedText" />
             </LinearLayout>
 
         </LinearLayout>

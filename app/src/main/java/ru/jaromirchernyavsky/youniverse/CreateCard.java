@@ -4,15 +4,15 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Base64;
-import android.util.Log;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,17 +37,18 @@ import org.json.JSONObject;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Random;
 
 import ar.com.hjg.pngj.PngjInputException;
 import ru.jaromirchernyavsky.youniverse.adapters.EditCardAdapter;
 
-public class CreateCard extends AppCompatActivity implements View.OnFocusChangeListener, View.OnClickListener {
+public class CreateCard extends AppCompatActivity implements View.OnClickListener, TextWatcher {
     boolean world = false;
     Uri imageuri;
     ImageView image;
     ArrayList<Card> cards;
-    ActivityResultLauncher<Intent> pickImage = registerForActivityResult(
+    final ActivityResultLauncher<Intent> pickImage = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
                 @Override
@@ -55,7 +56,7 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         // There are no request codes
                         Intent data = result.getData();
-                        imageuri = data.getData();
+                        imageuri = Objects.requireNonNull(data).getData();
                         image.setImageURI(imageuri);
                         try {
                             InputStream iStream =   getContentResolver().openInputStream(imageuri);
@@ -63,12 +64,12 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
                             MaterialAlertDialogBuilder alertDialogBuilder = alertDialog();
                             alertDialogBuilder.setPositiveButton("Да",(dialog, which) -> {
                                 try {
-                                    name.getEditText().setText(jsonData.getString("name"));
-                                summary.getEditText().setText(jsonData.getString("description"));
-                                first_message.getEditText().setText(jsonData.getString("first_mes"));
-                                scenario.getEditText().setText(jsonData.getString("scenario"));
-                                example.getEditText().setText(jsonData.getString("mes_example"));
-                                ArrayList<Card> jsonCards = new ArrayList<>();
+                                    Objects.requireNonNull(name.getEditText()).setText(jsonData.getString("name"));
+                                Objects.requireNonNull(summary.getEditText()).setText(jsonData.getString("description"));
+                                Objects.requireNonNull(first_message.getEditText()).setText(jsonData.getString("first_mes"));
+                                Objects.requireNonNull(scenario.getEditText()).setText(jsonData.getString("scenario"));
+                                Objects.requireNonNull(example.getEditText()).setText(jsonData.getString("mes_example"));
+                                ArrayList<Card> jsonCards;
                                 try {
                                     jsonCards = Utilities.getCardsFromJsonList(getApplicationContext(),jsonData.getString("characters"));
                                     if(jsonCards.size()==0) jsonCards=null;
@@ -100,7 +101,7 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
                         } catch (PngjInputException ignored){
                         }
 
-                        btn.setEnabled(imageuri!=null&&!name.getEditText().getText().toString().isEmpty() && !summary.getEditText().getText().toString().isEmpty() && !first_message.getEditText().getText().toString().isEmpty());
+                        btn.setEnabled(imageuri!=null&&!Objects.requireNonNull(name.getEditText()).getText().toString().isEmpty() && !Objects.requireNonNull(summary.getEditText()).getText().toString().isEmpty() && !Objects.requireNonNull(first_message.getEditText()).getText().toString().isEmpty());
                     }
                 }
             });
@@ -117,8 +118,10 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ActionBar bar = getSupportActionBar();
-        bar.setDisplayShowTitleEnabled(false);
+        Objects.requireNonNull(bar).setDisplayShowTitleEnabled(false);
+        bar.setBackgroundDrawable(new ColorDrawable(getColor(R.color.main)));
         bar.setDisplayHomeAsUpEnabled(true);
+        bar.setBackgroundDrawable(new ColorDrawable(getColor(R.color.main)));
         bar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_new_24);
         setContentView(R.layout.activity_create);
         image = findViewById(R.id.image);
@@ -126,7 +129,7 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
             //Check permission, if no ask for, if granted launch activity
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
                 if(checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES)== PackageManager.PERMISSION_DENIED){
-                    String[] permissions = new String[0];
+                    String[] permissions;
                     permissions = new String[]{Manifest.permission.READ_MEDIA_IMAGES};
                     requestPermissions(permissions,PERMISSION_CODE);
                 } else{
@@ -134,7 +137,7 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
                 }
             } else{
                 if(checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_DENIED){
-                    String[] permissions = new String[0];
+                    String[] permissions;
                     permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
                     requestPermissions(permissions,PERMISSION_CODE);
                 } else{
@@ -149,11 +152,11 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
             throw new RuntimeException(e);
         }
         name = findViewById(R.id.name);
-        name.getEditText().setOnFocusChangeListener(this);
+        Objects.requireNonNull(name.getEditText()).addTextChangedListener(this);
         summary = findViewById(R.id.Summary);
-        summary.getEditText().setOnFocusChangeListener(this);
+        Objects.requireNonNull(summary.getEditText()).addTextChangedListener(this);
         first_message = findViewById(R.id.first_message);
-        first_message.getEditText().setOnFocusChangeListener(this);
+        Objects.requireNonNull(first_message.getEditText()).addTextChangedListener(this);
         scenario = findViewById(R.id.Scenario);
         example = findViewById(R.id.Primer);
         RecyclerView recyclerView = findViewById(R.id.cards);
@@ -161,7 +164,7 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         worldlayout = findViewById(R.id.worldGroup);
         recyclerView.setLayoutManager(linearLayoutManager);
-        EditCardAdapter editCardAdapter = new EditCardAdapter(new ArrayList<Card>(),cards);
+        EditCardAdapter editCardAdapter = new EditCardAdapter(new ArrayList<>(),cards);
         TextView morecards = findViewById(R.id.MoreCards);
         if(cards.isEmpty()){
             recyclerView.setVisibility(View.GONE);
@@ -196,21 +199,14 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case PERMISSION_CODE:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    pickImageFromGallery();
-                } else {
-                    Toast.makeText(this, "Отказано в доступе", Toast.LENGTH_SHORT).show();
-                }
+        if (requestCode == PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                pickImageFromGallery();
+            } else {
+                Toast.makeText(this, "Отказано в доступе", Toast.LENGTH_SHORT).show();
+            }
         }
     }
-
-    @Override
-    public void onFocusChange(View v, boolean hasFocus) {
-        btn.setEnabled(imageuri!=null&&!name.getEditText().getText().toString().isEmpty() && !summary.getEditText().getText().toString().isEmpty() && !first_message.getEditText().getText().toString().isEmpty());
-    }
-
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == android.R.id.home) {
@@ -232,5 +228,20 @@ public class CreateCard extends AppCompatActivity implements View.OnFocusChangeL
             summary.setHint("Сюжет мира");
             worldlayout.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        btn.setEnabled(Objects.requireNonNull(name.getEditText()).getText().toString().length()<=20&&imageuri!=null&&!Objects.requireNonNull(name.getEditText()).getText().toString().isEmpty() && !Objects.requireNonNull(summary.getEditText()).getText().toString().isEmpty() && !Objects.requireNonNull(first_message.getEditText()).getText().toString().isEmpty());
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
     }
 }

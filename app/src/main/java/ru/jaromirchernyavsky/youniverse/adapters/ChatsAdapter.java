@@ -1,30 +1,22 @@
 package ru.jaromirchernyavsky.youniverse.adapters;
 
-import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.card.MaterialCardView;
-
 import java.util.ArrayList;
 
-import ru.jaromirchernyavsky.youniverse.Card;
 import ru.jaromirchernyavsky.youniverse.ChatMessage;
 import ru.jaromirchernyavsky.youniverse.R;
-import ru.jaromirchernyavsky.youniverse.ViewChats;
 
 public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder>{
-    private ArrayList<ArrayList<ChatMessage>> messages;
-    private View.OnClickListener onClickListener;
+    private final ArrayList<ArrayList<ChatMessage>> messages;
+    private final View.OnClickListener onClickListener;
     private int pos;
     public ChatsAdapter(ArrayList<ArrayList<ChatMessage>> messages, View.OnClickListener onClickListener){
         this.messages = messages;
@@ -39,21 +31,19 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder>{
 
     @Override
     public void onBindViewHolder(@NonNull ChatsAdapter.ViewHolder holder, int position) {
-        MessageAdapter messageAdapter = new MessageAdapter(messages.get(position));
+        MessageAdapter messageAdapter = new MessageAdapter(messages.get(position), false);
         holder.lastMessages.setAdapter(messageAdapter);
-        holder.lastMessages.setLayoutManager(new LinearLayoutManager(holder.lastMessages.getContext()));
-        holder.lastMessages.scrollToPosition(messages.get(position).size());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(holder.lastMessages.getContext());
+        layoutManager.setStackFromEnd(true);
+        holder.lastMessages.setLayoutManager(layoutManager);
+        holder.lastMessages.setClickable(false);
         holder.chat.setOnClickListener(v -> {
             setPos(holder.getAdapterPosition());
             onClickListener.onClick(v);
         });
         holder.delete.setOnClickListener(v -> {
-            try{
-                messages.remove(holder.getAdapterPosition());
-                notifyItemRemoved(holder.getAdapterPosition());
-            } catch (Exception ignore){
-            }
-
+            messages.remove(holder.getAdapterPosition());
+            notifyItemRemoved(holder.getAdapterPosition());
         });
     }
 
@@ -71,9 +61,9 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder>{
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageButton delete;
-        public RecyclerView lastMessages;
-        public ImageButton chat;
+        public final ImageButton delete;
+        public final RecyclerView lastMessages;
+        public final ImageButton chat;
 
         public ViewHolder(View itemView) {
             super(itemView);

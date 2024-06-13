@@ -2,7 +2,6 @@ package ru.jaromirchernyavsky.youniverse;
 
 import android.graphics.Typeface;
 import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.StyleSpan;
@@ -10,11 +9,9 @@ import android.text.style.StyleSpan;
 import androidx.annotation.NonNull;
 
 import org.apache.commons.text.StringEscapeUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class ChatMessage {
-    private String role;
+    private final String role;
     private String text;
 
     public ChatMessage(String role, String text) {
@@ -30,10 +27,6 @@ public class ChatMessage {
         return text;
     }
 
-    public void setRole(String role) {
-        this.role = role;
-    }
-
     public void setText(String text) {
         this.text = text;
     }
@@ -42,10 +35,10 @@ public class ChatMessage {
     public Spannable getSpannable() {
         SpannableStringBuilder result = new SpannableStringBuilder(text);
         int substring = 0;
-        int endstring = 0;
+        int endstring;
         //Checking for asterisks
         //TODO maybe change for Pattern finder
-        while (substring != -1 && endstring != -1) {
+        while (substring != -1) {
             substring = result.toString().indexOf("*");
             endstring = result.toString().indexOf("*", substring + 1);
             if (substring != -1 && endstring != -1) {
@@ -56,7 +49,6 @@ public class ChatMessage {
             substring = result.toString().indexOf("\\n");
             if (substring != -1) {
                 result.replace(substring,substring + 2,System.lineSeparator());
-                endstring=0;
             }
         }
         return result;
@@ -68,8 +60,4 @@ public class ChatMessage {
         return "{\"role\":\"" + role + "\",\"content\":\"" + StringEscapeUtils.escapeJava(text) + "\"}";
     }
 
-    public ChatMessage(JSONObject json) throws JSONException {
-        role = json.getString("role");
-        text = json.getString("content");
-    }
 }

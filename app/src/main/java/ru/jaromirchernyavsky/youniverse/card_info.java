@@ -15,8 +15,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,7 +28,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-import android.window.OnBackInvokedDispatcher;
 
 import com.github.leandroborgesferreira.loadingbutton.customViews.CircularProgressButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -38,12 +40,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import ar.com.hjg.pngj.PngjInputException;
 import ru.jaromirchernyavsky.youniverse.adapters.EditCardAdapter;
 import ru.jaromirchernyavsky.youniverse.adapters.WorldCardAdapter;
 
-public class card_info extends AppCompatActivity implements View.OnFocusChangeListener {
+public class card_info extends AppCompatActivity implements TextWatcher {
     String name;
     Uri pfp;
     JSONObject data;
@@ -65,7 +68,7 @@ public class card_info extends AppCompatActivity implements View.OnFocusChangeLi
     LinearLayout linearLayout;
     CircularProgressButton btn;
     boolean world;
-    ActivityResultLauncher<Intent> pickImage = registerForActivityResult(
+    final ActivityResultLauncher<Intent> pickImage = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
                 @Override
@@ -73,7 +76,7 @@ public class card_info extends AppCompatActivity implements View.OnFocusChangeLi
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         // There are no request codes
                         Intent data = result.getData();
-                        pfp = data.getData();
+                        pfp = Objects.requireNonNull(data).getData();
                         image.setImageURI(pfp);
                         try {
                             InputStream iStream =   getContentResolver().openInputStream(pfp);
@@ -85,7 +88,7 @@ public class card_info extends AppCompatActivity implements View.OnFocusChangeLi
                                 } catch (JSONException e) {
                                     throw new RuntimeException(e);
                                 }
-                                ArrayList<Card> jsonCards = new ArrayList<>();
+                                ArrayList<Card> jsonCards;
                                 try {
                                     jsonCards = Utilities.getCardsFromJsonList(getApplicationContext(),jsonData.getString("characters"));
                                 } catch (JSONException e){
@@ -106,24 +109,24 @@ public class card_info extends AppCompatActivity implements View.OnFocusChangeLi
                                 }
                             });
                             alert.show();
-                        } catch (JSONException e) {
+                        } catch (JSONException | FileNotFoundException e) {
                             throw new RuntimeException(e);
-                        } catch (FileNotFoundException e) {
-                            throw new RuntimeException(e);
-                        } catch (PngjInputException e){
+                        } catch (PngjInputException ignored){
                         }
-                        btn.setEnabled(pfp!=null&&!til_name.getEditText().getText().toString().isEmpty() && !til_summary.getEditText().getText().toString().isEmpty() && !til_first_message.getEditText().getText().toString().isEmpty());
+                        btn.setEnabled(pfp!=null&&!Objects.requireNonNull(til_name.getEditText()).getText().toString().isEmpty() && !Objects.requireNonNull(til_summary.getEditText()).getText().toString().isEmpty() && !Objects.requireNonNull(til_first_message.getEditText()).getText().toString().isEmpty());
                     }
                 }
             });
     private static final int PERMISSION_CODE = 1001;
 
+    /** @noinspection ResultOfMethodCallIgnored*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ActionBar bar = getSupportActionBar();
-        bar.setDisplayShowTitleEnabled(false);
-        bar.setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(bar).setDisplayShowTitleEnabled(false);
+        bar.setBackgroundDrawable(new ColorDrawable(getColor(R.color.main)));
+bar.setDisplayHomeAsUpEnabled(true);
         bar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_new_24);
         setContentView(R.layout.activity_card_info);
         til_name = findViewById(R.id.name);
@@ -143,7 +146,7 @@ public class card_info extends AppCompatActivity implements View.OnFocusChangeLi
         image.setOnClickListener(v -> {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
                 if(checkSelfPermission(android.Manifest.permission.READ_MEDIA_IMAGES)== PackageManager.PERMISSION_DENIED){
-                    String[] permissions = new String[0];
+                    String[] permissions;
                     permissions = new String[]{android.Manifest.permission.READ_MEDIA_IMAGES};
                     requestPermissions(permissions,PERMISSION_CODE);
                 } else{
@@ -151,7 +154,7 @@ public class card_info extends AppCompatActivity implements View.OnFocusChangeLi
                 }
             } else{
                 if(checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_DENIED){
-                    String[] permissions = new String[0];
+                    String[] permissions;
                     permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
                     requestPermissions(permissions,PERMISSION_CODE);
                 } else{
@@ -159,11 +162,11 @@ public class card_info extends AppCompatActivity implements View.OnFocusChangeLi
                 }
             }
         });
-        til_name.getEditText().setOnFocusChangeListener(this);
-        til_summary.getEditText().setOnFocusChangeListener(this);
-        til_first_message.getEditText().setOnFocusChangeListener(this);
-        til_scenario.getEditText().setOnFocusChangeListener(this);
-        til_example.getEditText().setOnFocusChangeListener(this);
+        Objects.requireNonNull(til_name.getEditText()).addTextChangedListener(this);
+        Objects.requireNonNull(til_summary.getEditText()).addTextChangedListener(this);
+        Objects.requireNonNull(til_first_message.getEditText()).addTextChangedListener(this);
+        Objects.requireNonNull(til_scenario.getEditText()).addTextChangedListener(this);
+        Objects.requireNonNull(til_example.getEditText()).addTextChangedListener(this);
         btn_chat.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), ViewChats.class);
             intent.putExtra("name",name);
@@ -174,19 +177,17 @@ public class card_info extends AppCompatActivity implements View.OnFocusChangeLi
             intent.putExtra("world",world);
             v.getContext().startActivity(intent);
         });
-        btn_edit.setOnClickListener(v -> {
-            toggleEdits();
-        });
+        btn_edit.setOnClickListener(v -> toggleEdits());
         btn.setOnClickListener(v -> {
             btn.startAnimation();
             Bitmap finalBitmap = Utilities.getContactBitmapFromURI(this,pfp);
-            new File(pfp.getPath()).delete();
-            String metadata = "";
+            new File(Objects.requireNonNull(pfp.getPath())).delete();
+            String metadata;
             if(world){
                 metadata = Utilities.generateMetadata(this,til_summary,til_first_message,til_example,til_name,til_scenario,editCardAdapter.getAdded());
                 cards = editCardAdapter.getAdded();
             } else{
-                metadata = Utilities.generateMetadata(this,til_summary,til_first_message,til_example,til_name,til_scenario,new ArrayList<Card>());
+                metadata = Utilities.generateMetadata(this,til_summary,til_first_message,til_example,til_name,til_scenario, new ArrayList<>());
             }
             Utilities.saveCard(this,finalBitmap,metadata,pfp.getLastPathSegment(),world,true);
             toggleEdits();
@@ -199,16 +200,17 @@ public class card_info extends AppCompatActivity implements View.OnFocusChangeLi
         pickImage.launch(intent);
     }
     private void setEdits(String name, String summary, String firstMessage, String scenario, String example){
-        til_name.getEditText().setText(name);
-        til_summary.getEditText().setText(summary);
-        til_first_message.getEditText().setText(firstMessage);
-        til_scenario.getEditText().setText(scenario);
-        til_example.getEditText().setText(example);
+        Objects.requireNonNull(til_name.getEditText()).setText(name);
+        Objects.requireNonNull(til_summary.getEditText()).setText(summary);
+        Objects.requireNonNull(til_first_message.getEditText()).setText(firstMessage);
+        Objects.requireNonNull(til_scenario.getEditText()).setText(scenario);
+        Objects.requireNonNull(til_example.getEditText()).setText(example);
     }
 
+    /** @noinspection ResultOfMethodCallIgnored*/
     private void initEdits(){
         try {
-            data = new JSONObject(getIntent().getStringExtra("data"));
+            data = new JSONObject(Objects.requireNonNull(getIntent().getStringExtra("data")));
             description = data.getString("description");
             firstMessage = data.getString("first_mes");
             scenario = data.getString("scenario");
@@ -216,6 +218,8 @@ public class card_info extends AppCompatActivity implements View.OnFocusChangeLi
             pfp = getIntent().getParcelableExtra("uri");
             exampleMessages = data.getString("mes_example");
             world = getIntent().getBooleanExtra("world",false);
+            setEdits(name,description,firstMessage,scenario,exampleMessages);
+            image.setImageURI(pfp);
             if(world) {
                 LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
                 linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
@@ -224,8 +228,8 @@ public class card_info extends AppCompatActivity implements View.OnFocusChangeLi
                 if(cards.contains(null)){
                     cards.remove(null);
                     Bitmap finalBitmap = Utilities.getContactBitmapFromURI(this,pfp);
-                    new File(pfp.getPath()).delete();
-                    String metadata = Utilities.generateMetadata(this,til_summary,til_first_message,til_example,til_name,til_scenario,editCardAdapter.getAdded());
+                    new File(Objects.requireNonNull(pfp.getPath())).delete();
+                    String metadata = Utilities.generateMetadata(this,til_summary,til_first_message,til_example,til_name,til_scenario, new ArrayList<>());
                     Utilities.saveCard(this,finalBitmap,metadata,pfp.getLastPathSegment(),world,false);
                 }
                 linearLayout.setVisibility(View.VISIBLE);
@@ -235,8 +239,6 @@ public class card_info extends AppCompatActivity implements View.OnFocusChangeLi
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-        setEdits(name,description,firstMessage,scenario,exampleMessages);
-        image.setImageURI(pfp);
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -264,13 +266,12 @@ public class card_info extends AppCompatActivity implements View.OnFocusChangeLi
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case PERMISSION_CODE:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    pickImageFromGallery();
-                } else {
-                    Toast.makeText(this, "Отказано в доступе", Toast.LENGTH_SHORT).show();
-                }
+        if (requestCode == PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                pickImageFromGallery();
+            } else {
+                Toast.makeText(this, "Отказано в доступе", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -291,7 +292,7 @@ public class card_info extends AppCompatActivity implements View.OnFocusChangeLi
         if(world){
             if(enable){
                 try {
-                    ArrayList<Card> temp_cards = new ArrayList<Card>(cards);
+                    ArrayList<Card> temp_cards = new ArrayList<>(cards);
                     editCardAdapter = new EditCardAdapter(temp_cards,Utilities.getCards(this,false));
                     recyclerView.setAdapter(editCardAdapter);
                 } catch (JSONException e) {
@@ -326,7 +327,17 @@ public class card_info extends AppCompatActivity implements View.OnFocusChangeLi
     }
 
     @Override
-    public void onFocusChange(View v, boolean hasFocus) {
-        btn.setEnabled(pfp!=null&&!til_name.getEditText().getText().toString().isEmpty() && !til_summary.getEditText().getText().toString().isEmpty() && !til_first_message.getEditText().getText().toString().isEmpty());
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        btn.setEnabled(Objects.requireNonNull(til_name.getEditText()).getText().toString().length()<=20&&pfp!=null&&!Objects.requireNonNull(til_name.getEditText()).getText().toString().isEmpty() && !Objects.requireNonNull(til_summary.getEditText()).getText().toString().isEmpty() && !Objects.requireNonNull(til_first_message.getEditText()).getText().toString().isEmpty());
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
     }
 }

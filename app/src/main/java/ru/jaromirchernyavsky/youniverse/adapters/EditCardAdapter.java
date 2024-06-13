@@ -16,8 +16,8 @@ import ru.jaromirchernyavsky.youniverse.Card;
 import ru.jaromirchernyavsky.youniverse.R;
 
 public class EditCardAdapter extends RecyclerView.Adapter<EditCardAdapter.ViewHolder>{
-    private ArrayList<Card> added;
-    private ArrayList<Card> all;
+    private final ArrayList<Card> added;
+    private final ArrayList<Card> all;
     public EditCardAdapter(ArrayList<Card> added,ArrayList<Card> all){
         for(Card card:added){
             all.removeIf(card::equals);
@@ -79,9 +79,9 @@ public class EditCardAdapter extends RecyclerView.Adapter<EditCardAdapter.ViewHo
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageView imageView;
-        public TextView name;
-        public ImageButton imgbutton;
+        public final ImageView imageView;
+        public final TextView name;
+        public final ImageButton imgbutton;
 
         public ViewHolder(View itemView) {
             super(itemView);

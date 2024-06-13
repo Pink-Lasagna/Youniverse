@@ -1,6 +1,3 @@
-import com.android.build.gradle.internal.tasks.R8Task
-import com.android.ide.common.resources.MergedResourceWriter
-
 plugins {
     id("com.android.application")
 }

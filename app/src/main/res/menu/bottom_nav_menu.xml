@@ -8,10 +8,10 @@
         android:title="@string/title_home" />
 
     <item
-        android:id="@+id/navigation_create"
         android:icon="@drawable/ic_dashboard_black_24dp"
         android:title="Create"
-        android:enabled="false"/>
+        android:enabled="false"
+        tools:ignore="HardcodedText" />
 
     <item
         android:id="@+id/navigation_notifications"

@@ -1,44 +1,37 @@
 package ru.jaromirchernyavsky.youniverse;
 
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.util.Base64;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
+import org.json.JSONException;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.util.Random;
+import java.util.ArrayList;
 
-import ar.com.hjg.pngj.IImageLine;
-import ar.com.hjg.pngj.PngReader;
-import ar.com.hjg.pngj.PngWriter;
-import ar.com.hjg.pngj.chunks.ChunkCopyBehaviour;
-import ar.com.hjg.pngj.chunks.PngChunkTEXT;
-import ar.com.hjg.pngj.chunks.PngChunkTextVar;
+import ru.jaromirchernyavsky.youniverse.adapters.RecyclerAdapter;
 import ru.jaromirchernyavsky.youniverse.databinding.ActivityMainBinding;
-import ru.jaromirchernyavsky.youniverse.ui.dashboard.DashboardFragment;
-import ru.jaromirchernyavsky.youniverse.ui.home.HomeFragment;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
+    public ArrayList<Card> cards;
+    RecyclerView recyclerView;
+    RecyclerAdapter adapter;
+    boolean world=true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,21 +40,55 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
-                .build();
         FloatingActionButton floatingActionButton = findViewById(R.id.floatingActionButton);
         floatingActionButton.setOnClickListener(v -> {
             Intent intent = new Intent(this, CreateCard.class);
             this.startActivity(intent);
         });
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-        NavigationUI.setupWithNavController(binding.navView, navController);
-    }
 
+        BottomNavigationView navView = findViewById(R.id.nav_view);
+        navView.setOnItemSelectedListener(v->{
+            world= v.getItemId() == R.id.navigation_home;
+            getCards();
+            return true;
+        });
+        EditText search = findViewById(R.id.search);
+        search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                filter(search.getText().toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        recyclerView = findViewById(R.id.recycler);
+        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
+        findViewById(R.id.account).setOnClickListener(v -> {
+            Intent intent = new Intent(this, Account.class);
+            startActivity(intent);
+        });
+    }
+    public void filter(String text){
+        ArrayList<Card> temp = new ArrayList<>();
+        for(Card d: cards){
+            //or use .equal(text) with you want equal match
+            //use .toLowerCase() for better matches
+            if(d.name.toLowerCase().contains(text.toLowerCase())){
+                temp.add(d);
+            }
+        }
+        //update recyclerview
+        adapter.updateList(temp);
+    }
     @Override
     protected void onResume() {
         SharedPreferences prefs = getSharedPreferences("UserInfo", 0);
@@ -78,11 +105,45 @@ public class MainActivity extends AppCompatActivity {
             alert.setTitle("Введите свое имя");
             alert.setView(input);
             alert.setPositiveButton("Выбрать", (dialog, which) -> {
-                edit.putString("username",input.getText().toString());
+                edit.putString("username", input.getText().toString());
                 edit.apply();
             });
             alert.show();
         }
+        try {
+            cards = Utilities.getCards(this,world);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        adapter = new RecyclerAdapter(cards);
+        recyclerView.setAdapter(adapter);
         super.onResume();
+    }
+
+    private void getCards(){
+        try {
+            cards = Utilities.getCards(this,world);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        adapter = new RecyclerAdapter(cards);
+        recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        switch (item.getOrder()){
+            case 0:
+                try {
+                    Utilities.addImageToGallery(this,cards.get(item.getItemId()).uri);
+                } catch (JSONException e) {
+                    throw new RuntimeException(e);
+                }
+                break;
+            case 1:
+                adapter.deleteCard(item.getGroupId());
+                break;
+        }
+        return true;
     }
 }

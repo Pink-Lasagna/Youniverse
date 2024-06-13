@@ -41,6 +41,7 @@ import ar.com.hjg.pngj.chunks.PngChunkTEXT;
 import ar.com.hjg.pngj.chunks.PngChunkTextVar;
 
 public class Utilities {
+    /** @noinspection ResultOfMethodCallIgnored */
     public static void saveCard(Activity context, Uri uri, String metadata, String fileName, boolean world, boolean endActivity){
         Bitmap finalBitmap = getContactBitmapFromURI(context.getApplicationContext(),uri);
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -59,7 +60,7 @@ public class Utilities {
             }
             try {
                 FileOutputStream out = new FileOutputStream(file);
-                finalBitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
+                Objects.requireNonNull(finalBitmap).compress(Bitmap.CompressFormat.PNG, 90, out);
                 out.flush();
                 out.close();
             } catch (Exception e) {
@@ -89,6 +90,7 @@ public class Utilities {
         });
     }
 
+    /** @noinspection ResultOfMethodCallIgnored */
     public static void saveCard(Activity context, Bitmap finalBitmap, String metadata, String fileName, boolean world, boolean endActivity){
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
@@ -156,14 +158,15 @@ public class Utilities {
         return null;
     }
 
-    public static ArrayList<Card> getCards(Context context,boolean world) throws JSONException {
+    /** @noinspection ResultOfMethodCallIgnored*/
+    public static ArrayList<Card> getCards(Context context, boolean world) throws JSONException {
         ArrayList<Card> cards = new ArrayList<>();
         String dir = context.getFilesDir()+"/saved_images/";
         dir += world? "worlds/":"chars/";
         if (!new File(dir).exists()) {
             new File(dir).mkdirs();
         }
-        for (File file : new File(dir).listFiles()) {
+        for (File file : Objects.requireNonNull(new File(dir).listFiles())) {
             cards.add(getCardFromFileName(context,file.getName(),world));
         }
         return cards;
@@ -185,7 +188,7 @@ public class Utilities {
 
     public static String generateMetadata(Context context,  TextInputLayout summary, TextInputLayout first_message, TextInputLayout example, TextInputLayout name, TextInputLayout scenario, ArrayList<Card> cards){
         String username = getName(context);
-        return "{\"data\":{\"alternate_greetings\": [], \"avatar\": \"none\",\"character_version\":\"main\",\"creator\": \""+username+"\",\"creator_notes\": \"\",\"description\": \""+summary.getEditText().getText().toString()+"\",\"first_mes\": \""+first_message.getEditText().getText().toString()+"\",\"mes_example\": \""+example.getEditText().getText().toString()+"\",\"name\": \""+name.getEditText().getText().toString()+"\",\"post_history_instructions\": \"\",\"scenario\": \""+scenario.getEditText().getText().toString()+"\",\"system_prompt\": \"\",\"tags\": [],\"characters\":["+getStringJsonfromCards(cards)+"]},\"spec\": \"chara_card_v2\",\"spec_version\": \"2.0\"}";
+        return "{\"data\":{\"alternate_greetings\": [], \"avatar\": \"none\",\"character_version\":\"main\",\"creator\": \""+username+"\",\"creator_notes\": \"\",\"description\": \""+ Objects.requireNonNull(summary.getEditText()).getText().toString()+"\",\"first_mes\": \""+ Objects.requireNonNull(first_message.getEditText()).getText().toString()+"\",\"mes_example\": \""+ Objects.requireNonNull(example.getEditText()).getText().toString()+"\",\"name\": \""+ Objects.requireNonNull(name.getEditText()).getText().toString()+"\",\"post_history_instructions\": \"\",\"scenario\": \""+ Objects.requireNonNull(scenario.getEditText()).getText().toString()+"\",\"system_prompt\": \"\",\"tags\": [],\"characters\":["+getStringJsonfromCards(cards)+"]},\"spec\": \"chara_card_v2\",\"spec_version\": \"2.0\"}";
     }
 
     public static Card getCardFromFileName(Context context, String fileName,boolean world) throws JSONException {
@@ -198,23 +201,22 @@ public class Utilities {
     }
 
     public static String getMessages(ArrayList<ChatMessage> chatMessages){
-        String result = "";
+        StringBuilder result = new StringBuilder();
         for(ChatMessage msg : chatMessages){
-            result+=","+msg;
+            result.append(",").append(msg);
         }
-        return result;
+        return result.toString();
     }
 
     public static String getName(Context context){
         SharedPreferences pref = context.getSharedPreferences("UserInfo",0);
-        String username = pref.getString("username","user");
-        return username;
+        return pref.getString("username","user");
     }
     public static JSONObject getMetadataFromFile(String filePath) throws JSONException {
         File file = new File(filePath);
         PngReader pngr = new PngReader(file);
         String result = pngr.getMetadata().getTxtForKey("chara");
-        JSONObject data = new JSONObject(new JSONObject(new String(Base64.decode(result, Base64.DEFAULT))).getString("data"));;
+        JSONObject data = new JSONObject(new JSONObject(new String(Base64.decode(result, Base64.DEFAULT))).getString("data"));
         pngr.close();
         return data;
     }
@@ -222,7 +224,7 @@ public class Utilities {
     public static JSONObject getMetadataFromFile(InputStream inputStream) throws JSONException {
         PngReader pngr = new PngReader(inputStream);
         String result = pngr.getMetadata().getTxtForKey("chara");
-        JSONObject data = new JSONObject(new JSONObject(new String(Base64.decode(result, Base64.DEFAULT))).getString("data"));;
+        JSONObject data = new JSONObject(new JSONObject(new String(Base64.decode(result, Base64.DEFAULT))).getString("data"));
         pngr.close();
         return data;
     }
@@ -237,10 +239,10 @@ public class Utilities {
     }
 
     public static String getStringJsonfromCards(ArrayList<Card> cards){
-        String chars = "";
+        StringBuilder chars = new StringBuilder();
         if(cards.isEmpty()) return "";
         for(Card card : cards){
-            chars += card.toJsonStringFile()+",";
+            chars.append(card.toJsonStringFile()).append(",");
         }
         return chars.substring(0,chars.length()-1);
     }
@@ -250,6 +252,30 @@ public class Utilities {
         SharedPreferences sharedPreferences = context.getSharedPreferences(TAG, 0);
         String serializedData = sharedPreferences.getString(Integer.toString(chatid), null);
         return serializedData==null?null:gson.fromJson(serializedData,new TypeToken<ArrayList<ChatMessage>>(){}.getType());
+    }
+    public static void deleteChats(Context context, String TAG){
+        SharedPreferences sharedPreferences = context.getSharedPreferences(TAG, 0);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
+    }
+
+    public static void storeUsernameDescription(Context context, String username, String description){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("UserInfo", 0);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("username",username);
+        editor.putString("description",description);
+        editor.apply();
+    }
+
+    public static String getUsername(Context context){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("UserInfo", 0);
+        return sharedPreferences.getString("username","user");
+    }
+
+    public static String getDescription(Context context){
+        SharedPreferences sharedPreferences = context.getSharedPreferences("UserInfo", 0);
+        return sharedPreferences.getString("description","");
     }
 
     public static void storeMessages(Context context, ArrayList<ChatMessage> messages,String TAG,int chatid){
@@ -285,52 +311,16 @@ public class Utilities {
                         "Ты должен генерировать действия существ, находящихся в мире \"%s\", и описывать последствия действий персонажа \"%s\". Также ты должен вкратце и детализировано описывать сцену вокруг пользователя в данный момент, используя яркие эпитеты и образы. Генерируй речь существ и персонажей, которых встречает пользователь, придавая им уникальные голоса и характерные черты. Обособляй все описания и действия звездочками *, кроме прямой речи персонажей.",
                 name, username, userPersona, description, scenario, exampleMessages, name, username));
     }
+    /** @noinspection ResultOfMethodCallIgnored*/
     public static void addImageToGallery(Context context, Uri conturi) throws JSONException {
         Bitmap bitmap = getContactBitmapFromURI(context, conturi);
-//        if (SDK_INT >= Build.VERSION_CODES.Q) {
-//            try {
-//                final ContentValues values = new ContentValues();
-//                values.put(MediaStore.MediaColumns.DISPLAY_NAME, conturi.getLastPathSegment().replace(".png",Long.toString(System.currentTimeMillis())));
-//                values.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
-//                values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
-//                System.out.println(Environment.DIRECTORY_PICTURES);
-//                final ContentResolver resolver = context.getContentResolver();
-//                Uri uri = null;
-//                try {
-//                    final Uri contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-//                    uri = resolver.insert(contentUri, values);
-//                    if (uri == null) {
-//                        //isSuccess = false;
-//                        throw new IOException("Failed to create new MediaStore record.");
-//                    }
-//                    try (final OutputStream stream = resolver.openOutputStream(uri)) {
-//                        if (stream == null) {
-//                            //isSuccess = false;
-//                            throw new IOException("Failed to open output stream.");
-//                        }
-//                        if (!bitmap.compress(Bitmap.CompressFormat.PNG, 95, stream)) {
-//                            //isSuccess = false;
-//                            throw new IOException("Failed to save bitmap.");
-//                        }
-//                    }
-//                    //isSuccess = true;
-//                } catch (IOException e) {
-//                    if (uri != null) {
-//                        resolver.delete(uri, null, null);
-//                    }
-//                    throw e;
-//                }
-//            } catch (Exception e) {
-//                //show error to user that operatoin failed
-//            }
-//        } else {
         OutputStream fos;
         String imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
-        String name = conturi.getLastPathSegment().replace(".png", Long.toString(System.currentTimeMillis()));
+        String name = Objects.requireNonNull(conturi.getLastPathSegment()).replace(".png", Long.toString(System.currentTimeMillis()));
         File image = new File(imagesDir,  name + ".png");
         try {
-            fos = new FileOutputStream(image);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 95, fos);
+            fos = Files.newOutputStream(image.toPath());
+            Objects.requireNonNull(bitmap).compress(Bitmap.CompressFormat.PNG, 95, fos);
             Objects.requireNonNull(fos).close();
         } catch (IOException e) {
             e.printStackTrace();
