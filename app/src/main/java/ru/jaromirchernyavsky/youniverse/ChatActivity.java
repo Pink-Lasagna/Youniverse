@@ -115,7 +115,7 @@ public class ChatActivity extends AppCompatActivity {
             ExecutorService executor = Executors.newSingleThreadExecutor();
             executor.execute(() -> {
                 String url = "https://api.proxyapi.ru/openai/v1/chat/completions";
-                String apiKey = new values().API_KEY;
+                String apiKey = values.API_KEY;
                 String model = "gpt-3.5-turbo";
                 try {
 
@@ -128,7 +128,6 @@ public class ChatActivity extends AppCompatActivity {
                     // The request body
                     String body = "{\"model\": \"" + model + "\", \"messages\": [{\"role\": \"system\", \"content\": \""+ sys_prompt +"\"}"+Utilities.getMessages(messages)+"],\"stream\":true}";
                     connection.setDoOutput(true);
-                    System.out.println(body);
                     OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
                     writer.write(body);
                     writer.flush();

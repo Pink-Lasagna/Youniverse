@@ -1,23 +1,31 @@
 package ru.jaromirchernyavsky.youniverse.adapters;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import org.json.JSONException;
 
 import java.io.File;
 import java.util.ArrayList;
 
 import ru.jaromirchernyavsky.youniverse.Card;
 import ru.jaromirchernyavsky.youniverse.R;
+import ru.jaromirchernyavsky.youniverse.Utilities;
 import ru.jaromirchernyavsky.youniverse.card_info;
+import ru.jaromirchernyavsky.youniverse.custom.DeleteConfirmation;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
     private ArrayList<Card> cards;
@@ -41,10 +49,10 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             intent.putExtra("name",cards.get(holder.getAdapterPosition()).name);
             intent.putExtra("uri",cards.get(holder.getAdapterPosition()).uri);
             intent.putExtra("data",cards.get(holder.getAdapterPosition()).convertedData.toString());
-            intent.putExtra("userPersona","human");
             intent.putExtra("world",cards.get(holder.getAdapterPosition()).world);
             v.getContext().startActivity(intent);
         });
+        holder.more.setOnClickListener(v->{showPopupMenu(holder.itemView.getContext(), holder);});
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -59,26 +67,42 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     }
 
 
-    static class ViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener{
+    static class ViewHolder extends RecyclerView.ViewHolder {
         public final ImageView imageView;
         public final TextView name;
         public final TextView description;
+        public final ImageButton more;
 
         public ViewHolder(View itemView) {
             super(itemView);
+            more = itemView.findViewById(R.id.more);
             imageView = itemView.findViewById(R.id.image);
             name = itemView.findViewById(R.id.name);
             description = itemView.findViewById(R.id.description);
-            itemView.setOnCreateContextMenuListener(this);
-        }
 
-        @Override
-        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            menu.add(this.getAdapterPosition(),0,0,"Скачать в галерею");
-            menu.add(this.getAdapterPosition(),1,1,"Удалить");
         }
     }
-
+    private void showPopupMenu(Context context, ViewHolder v) {
+        PopupMenu popupMenu = new PopupMenu(context, v.more);
+        popupMenu.getMenu().add(v.getAdapterPosition(),0,0,"Скачать в галерею");
+        popupMenu.getMenu().add(v.getAdapterPosition(),1,1,"Удалить");
+        popupMenu.setOnMenuItemClickListener((PopupMenu.OnMenuItemClickListener) item -> {
+            switch (item.getOrder()) {
+                case 0:
+                    try {
+                        Utilities.addImageToGallery(context, cards.get(item.getItemId()).uri);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                    break;
+                case 1:
+                    DeleteConfirmation.show(context, (x, y) -> deleteCard(item.getGroupId()));
+                    break;
+            }
+            return false;
+        });
+        popupMenu.show();
+    }
     /** @noinspection ResultOfMethodCallIgnored*/
     public void deleteCard(int pos) {
         new File(cards.get(pos).uri.toString().substring(8)).delete();

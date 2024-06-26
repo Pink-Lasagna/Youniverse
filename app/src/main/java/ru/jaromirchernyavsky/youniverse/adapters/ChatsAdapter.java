@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 import ru.jaromirchernyavsky.youniverse.ChatMessage;
 import ru.jaromirchernyavsky.youniverse.R;
+import ru.jaromirchernyavsky.youniverse.custom.DeleteConfirmation;
 
 public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder>{
     private final ArrayList<ArrayList<ChatMessage>> messages;
@@ -42,8 +43,11 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder>{
             onClickListener.onClick(v);
         });
         holder.delete.setOnClickListener(v -> {
-            messages.remove(holder.getAdapterPosition());
-            notifyItemRemoved(holder.getAdapterPosition());
+            DeleteConfirmation.show(holder.itemView.getContext(), (dialogInterface, i) -> {
+                messages.remove(holder.getAdapterPosition());
+                notifyItemRemoved(holder.getAdapterPosition());
+            });
+
         });
     }
 

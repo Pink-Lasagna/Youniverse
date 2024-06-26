@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
@@ -114,6 +115,17 @@ public class CreateCard extends AppCompatActivity implements View.OnClickListene
     TextInputLayout example;
     MaterialSwitch materialSwitch;
     LinearLayout worldlayout;
+    long delay = 1000; // 1 seconds after user stops typing
+    long last_text_edit = 0;
+    Handler handler = new Handler();
+
+    private Runnable input_finish_checker = new Runnable() {
+        public void run() {
+            if (System.currentTimeMillis() > (last_text_edit + delay - 500)) {
+
+            }
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -237,11 +249,17 @@ public class CreateCard extends AppCompatActivity implements View.OnClickListene
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
+        handler.removeCallbacks(input_finish_checker);
         btn.setEnabled(Objects.requireNonNull(name.getEditText()).getText().toString().length()<=20&&imageuri!=null&&!Objects.requireNonNull(name.getEditText()).getText().toString().isEmpty() && !Objects.requireNonNull(summary.getEditText()).getText().toString().isEmpty() && !Objects.requireNonNull(first_message.getEditText()).getText().toString().isEmpty());
     }
 
     @Override
     public void afterTextChanged(Editable s) {
+        if (s.length() > 0) {
+            last_text_edit = System.currentTimeMillis();
+            handler.postDelayed(input_finish_checker, delay);
+        } else {
 
+        }
     }
 }

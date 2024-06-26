@@ -23,6 +23,7 @@ import org.json.JSONException;
 import java.util.ArrayList;
 
 import ru.jaromirchernyavsky.youniverse.adapters.RecyclerAdapter;
+import ru.jaromirchernyavsky.youniverse.custom.DeleteConfirmation;
 import ru.jaromirchernyavsky.youniverse.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
@@ -79,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
     }
     public void filter(String text){
         ArrayList<Card> temp = new ArrayList<>();
+        if(cards==null) return;
         for(Card d: cards){
             //or use .equal(text) with you want equal match
             //use .toLowerCase() for better matches
@@ -96,18 +98,7 @@ public class MainActivity extends AppCompatActivity {
         if(!previouslyStarted) {
             SharedPreferences.Editor edit = prefs.edit();
             edit.putBoolean("launched", true);
-            final EditText input = new EditText(MainActivity.this);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT);
-            input.setLayoutParams(lp);
-            MaterialAlertDialogBuilder alert = new MaterialAlertDialogBuilder(this);
-            alert.setTitle("Введите свое имя");
-            alert.setView(input);
-            alert.setPositiveButton("Выбрать", (dialog, which) -> {
-                edit.putString("username", input.getText().toString());
-                edit.apply();
-            });
+            MaterialAlertDialogBuilder alert = getMaterialAlertDialogBuilder(edit);
             alert.show();
         }
         try {
@@ -118,6 +109,22 @@ public class MainActivity extends AppCompatActivity {
         adapter = new RecyclerAdapter(cards);
         recyclerView.setAdapter(adapter);
         super.onResume();
+    }
+
+    private @NonNull MaterialAlertDialogBuilder getMaterialAlertDialogBuilder(SharedPreferences.Editor edit) {
+        final EditText input = new EditText(MainActivity.this);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        input.setLayoutParams(lp);
+        MaterialAlertDialogBuilder alert = new MaterialAlertDialogBuilder(this);
+        alert.setTitle("Введите свое имя");
+        alert.setView(input);
+        alert.setPositiveButton("Выбрать", (dialog, which) -> {
+            edit.putString("username", input.getText().toString());
+            edit.apply();
+        });
+        return alert;
     }
 
     private void getCards(){
@@ -132,18 +139,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
-        switch (item.getOrder()){
-            case 0:
-                try {
-                    Utilities.addImageToGallery(this,cards.get(item.getItemId()).uri);
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
-                }
-                break;
-            case 1:
-                adapter.deleteCard(item.getGroupId());
-                break;
-        }
+
         return true;
     }
 }
