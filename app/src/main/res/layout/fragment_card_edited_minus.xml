@@ -29,7 +29,7 @@
                     android:padding="10dp"
                     android:text="Пример"
                     android:textAppearance="?attr/textAppearanceTitleMedium"
-                    tools:ignore="HardcodedText" />
+                    />
 
                 <ImageButton
                     android:id="@+id/imgbtn"
@@ -39,7 +39,7 @@
                     android:src="@drawable/minus"
                     android:background="@color/red"
                     android:contentDescription="Убрать карточку"
-                    tools:ignore="HardcodedText" />
+                    />
             </LinearLayout>
 
             <!-- Media -->

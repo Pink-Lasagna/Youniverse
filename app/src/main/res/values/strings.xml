@@ -1,10 +1,19 @@
 <resources>
     <string name="app_name">Youniverse</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
-    <string name="title_activity_create_card">CreateCard</string>
-    <!-- Strings used for fragments for navigation -->
-    <!-- TODO: Remove or change this placeholder text -->
-
+    <string name="pers_text">Здесь будут появляться ваши персонажи.\n У вас пока нет карточек, нажмите на плюс снизу, чтобы создать их</string>
+    <string name="world_text">Здесь будут появляться ваши миры.\n У вас пока нет карточек, нажмите на плюс снизу, чтобы создать их</string>
+    <string name="add_image">Нажмите, чтобы загрузить картинку</string>
+    <string name="req">* Обязательное поле</string>
+    <string name="added_pers">Добавленные персонажи</string>
+    <string name="name_pers">Имя</string>
+    <string name="descr_pers">Общие черты</string>
+    <string name="create_btn">Создать</string>
+    <string name="add_char">Создайте персонажей, чтобы увидеть их здесь</string>
+    <string name="action_add_char">Добавьте персонажей:</string>
+    <string name="account_personality">Ваши общие черты</string>
+    <string name="first_mes_text">Приветствие</string>
+    <string name="scenario_text">Сценарий</string>
+    <string name="example_text">Пример сообщений</string>
+    <string name="save_btn">Сохранить</string>
+    <string name="create_card">Создание карточки</string>
 </resources>

@@ -42,13 +42,13 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:layout_marginStart="10dp"
-                android:hint="Имя"
+                android:hint="@string/name_pers"
                 app:counterEnabled="true"
                 app:counterMaxLength="20"
-                app:helperText="* Обязательное поле"
+                app:helperText="@string/req"
                 app:helperTextEnabled="true"
                 app:helperTextTextColor="#FF1744"
-                tools:ignore="HardcodedText">
+                >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -62,8 +62,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:hint="Ваши общие черты"
-            tools:ignore="HardcodedText">
+            android:hint="@string/account_personality"
+            >
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
@@ -87,10 +87,10 @@
             android:layout_height="50dp"
             android:layout_gravity="center"
             android:background="@color/main"
-            android:text="Сохранить"
+            android:text="@string/save_btn"
             android:textStyle="bold"
             app:spinning_bar_color="@color/white"
             app:spinning_bar_padding="5dp"
-            tools:ignore="HardcodedText" />
+            />
     </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,6 +7,19 @@
     android:clipChildren="false"
     android:layout_height="match_parent">
 
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/world_text"
+        app:layout_constraintBottom_toTopOf="@+id/nav_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginHorizontal="10dp"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linear" />
+
     <LinearLayout
         android:id="@+id/linear"
         android:layout_width="match_parent"
@@ -29,7 +42,7 @@
             android:importantForAutofill="no"
             android:inputType="text"
             android:padding="6dp"
-            tools:ignore="HardcodedText" />
+            />
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -41,7 +54,7 @@
             style="?selectableItemBackground"
             android:contentDescription="Аккаунт"
             android:src="@drawable/account"
-            tools:ignore="HardcodedText" />
+            />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -78,7 +91,7 @@
             app:elevation="0dp"
             app:fabSize="normal"
             app:maxImageSize="48dp"
-            tools:ignore="HardcodedText" />
+            />
 
     </com.google.android.material.bottomnavigation.BottomNavigationView>
 

@@ -18,25 +18,31 @@
         <activity
             android:name=".Account"
             android:theme="@style/Theme.Youniverse.BackButton"
+            android:configChanges="orientation|screenSize"
             android:exported="false" />
         <activity
             android:name=".ViewChats"
             android:exported="false"
+            android:configChanges="orientation|screenSize"
             android:theme="@style/Theme.Youniverse.BackButton" />
         <activity
             android:name=".card_info"
             android:exported="false"
+            android:configChanges="orientation|screenSize"
             android:theme="@style/Theme.Youniverse.BackButton" />
         <activity
             android:name=".ChatActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="adjustResize"/>
         <activity
             android:name=".CreateCard"
             android:exported="false"
+            android:configChanges="orientation|screenSize"
             android:theme="@style/Theme.Youniverse.BackButton" />
         <activity
             android:name=".MainActivity"
+            android:configChanges="orientation|screenSize"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

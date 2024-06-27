@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.json.JSONException;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import ru.jaromirchernyavsky.youniverse.Card;
@@ -79,7 +80,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
             imageView = itemView.findViewById(R.id.image);
             name = itemView.findViewById(R.id.name);
             description = itemView.findViewById(R.id.description);
-
         }
     }
     private void showPopupMenu(Context context, ViewHolder v) {
@@ -92,6 +92,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
                     try {
                         Utilities.addImageToGallery(context, cards.get(item.getItemId()).uri);
                     } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                     break;

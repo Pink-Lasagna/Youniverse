@@ -31,7 +31,7 @@
                     android:padding="10dp"
                     android:text="ПримерПримерПрим"
                     android:textAppearance="?attr/textAppearanceTitleMedium"
-                    tools:ignore="HardcodedText" />
+                    />
 
                 <ImageButton
                     android:id="@+id/more"
@@ -66,7 +66,7 @@
                     android:text="Пример описания"
                     android:textAppearance="?attr/textAppearanceBodyMedium"
                     android:textColor="?android:attr/textColorSecondary"
-                    tools:ignore="HardcodedText" />
+                    />
             </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

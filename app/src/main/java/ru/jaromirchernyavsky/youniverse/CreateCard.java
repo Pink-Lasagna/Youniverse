@@ -45,11 +45,11 @@ import ar.com.hjg.pngj.PngjInputException;
 import ru.jaromirchernyavsky.youniverse.adapters.EditCardAdapter;
 
 public class CreateCard extends AppCompatActivity implements View.OnClickListener, TextWatcher {
-    boolean world = false;
-    Uri imageuri;
-    ImageView image;
-    ArrayList<Card> cards;
-    final ActivityResultLauncher<Intent> pickImage = registerForActivityResult(
+    private boolean world = false;
+    private Uri imageuri;
+    private ImageView image;
+    private ArrayList<Card> cards;
+    private final ActivityResultLauncher<Intent> pickImage = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
                 @Override
@@ -58,6 +58,8 @@ public class CreateCard extends AppCompatActivity implements View.OnClickListene
                         // There are no request codes
                         Intent data = result.getData();
                         imageuri = Objects.requireNonNull(data).getData();
+                        image.setImageTintMode(null);
+                        findViewById(R.id.text_add).setVisibility(View.GONE);
                         image.setImageURI(imageuri);
                         try {
                             InputStream iStream =   getContentResolver().openInputStream(imageuri);
@@ -73,7 +75,7 @@ public class CreateCard extends AppCompatActivity implements View.OnClickListene
                                 ArrayList<Card> jsonCards;
                                 try {
                                     jsonCards = Utilities.getCardsFromJsonList(getApplicationContext(),jsonData.getString("characters"));
-                                    if(jsonCards.size()==0) jsonCards=null;
+                                    if(jsonCards.isEmpty()) jsonCards=null;
                                 } catch (JSONException e){
                                     jsonCards = null;
                                 }
@@ -107,17 +109,17 @@ public class CreateCard extends AppCompatActivity implements View.OnClickListene
                 }
             });
     private static final int PERMISSION_CODE = 1001;
-    TextInputLayout name;
-    TextInputLayout summary;
-    TextInputLayout first_message;
-    TextInputLayout scenario;
-    CircularProgressButton btn;
-    TextInputLayout example;
-    MaterialSwitch materialSwitch;
-    LinearLayout worldlayout;
-    long delay = 1000; // 1 seconds after user stops typing
-    long last_text_edit = 0;
-    Handler handler = new Handler();
+    private TextInputLayout name;
+    private TextInputLayout summary;
+    private TextInputLayout first_message;
+    private TextInputLayout scenario;
+    private CircularProgressButton btn;
+    private TextInputLayout example;
+    private MaterialSwitch materialSwitch;
+    private LinearLayout worldlayout;
+    private long delay = 1000; // 1 seconds after user stops typing
+    private long last_text_edit = 0;
+    private Handler handler = new Handler();
 
     private Runnable input_finish_checker = new Runnable() {
         public void run() {

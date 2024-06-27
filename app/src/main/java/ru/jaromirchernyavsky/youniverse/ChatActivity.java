@@ -106,7 +106,7 @@ public class ChatActivity extends AppCompatActivity {
     private void generateMessage(){
         if(checkSelfPermission(Manifest.permission.INTERNET)== PackageManager.PERMISSION_DENIED){
             String[] permissions;
-            permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
+            permissions = new String[]{Manifest.permission.INTERNET};
             requestPermissions(permissions,PERMISSION_CODE);
         } else{
             messages.add(new ChatMessage("assistant",""));

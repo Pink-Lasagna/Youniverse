@@ -1,12 +1,16 @@
 package ru.jaromirchernyavsky.youniverse;
 
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Base64;
 
 import com.google.android.material.textfield.TextInputLayout;
@@ -229,13 +233,13 @@ public class Utilities {
         return data;
     }
 
-    public static JSONObject getFullMetadataFromFile(String filePath) throws JSONException {
+    public static String getFullMetadataFromFile(String filePath) throws JSONException {
         File file = new File(filePath);
         PngReader pngr = new PngReader(file);
         String result = pngr.getMetadata().getTxtForKey("chara");
         JSONObject data = new JSONObject(new String(Base64.decode(result, Base64.DEFAULT)));
         pngr.close();
-        return data;
+        return data.toString();
     }
 
     public static String getStringJsonfromCards(ArrayList<Card> cards){
@@ -312,25 +316,20 @@ public class Utilities {
                 name, username, userPersona, description, scenario, exampleMessages, name, username));
     }
     /** @noinspection ResultOfMethodCallIgnored*/
-    public static void addImageToGallery(Context context, Uri conturi) throws JSONException {
-        Bitmap bitmap = getContactBitmapFromURI(context, conturi);
+    public static void addImageToGallery(Context context, Uri conturi) throws JSONException, IOException {
         OutputStream fos;
-        String imagesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString();
-        String name = Objects.requireNonNull(conturi.getLastPathSegment()).replace(".png", Long.toString(System.currentTimeMillis()));
-        File image = new File(imagesDir,  name + ".png");
-        try {
-            fos = Files.newOutputStream(image.toPath());
-            Objects.requireNonNull(bitmap).compress(Bitmap.CompressFormat.PNG, 95, fos);
-            Objects.requireNonNull(fos).close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        File destFile = new File(imagesDir, name + "1.png");
-        PngReader pngr = new PngReader(image);
-        PngWriter pngw = new PngWriter(destFile, pngr.imgInfo, true);
+        ContentResolver resolver = context.getContentResolver();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, conturi.getLastPathSegment());
+        contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/png");
+        contentValues.put(MediaStore.MediaColumns.DATE_ADDED, System.currentTimeMillis());
+        Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+        fos = resolver.openOutputStream(imageUri);
+        PngReader pngr = new PngReader(new File(conturi.getPath()));
+        PngWriter pngw = new PngWriter(fos, pngr.imgInfo);
         PngChunkTextVar pngctv = new PngChunkTEXT(pngr.imgInfo);
-        String base64 = Base64.encodeToString(getFullMetadataFromFile(conturi.getPath()).toString().getBytes(), Base64.CRLF);
-        pngctv.setKeyVal("chara", base64);
+        String result = pngr.getMetadata().getTxtForKey("chara");
+        pngctv.setKeyVal("chara", result);
         pngctv.setPriority(true);
         pngw.getMetadata().queueChunk(pngctv);
         pngw.copyChunksFrom(pngr.getChunksList(), ChunkCopyBehaviour.COPY_TEXTUAL);
@@ -340,11 +339,7 @@ public class Utilities {
         }
         pngr.end();
         pngw.end();
-        image.delete();
-        try {
-            renameFile(destFile.toString(), name + ".png");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        fos.flush();
+        fos.close();
     }
 }

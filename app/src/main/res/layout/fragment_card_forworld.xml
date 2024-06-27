@@ -27,7 +27,7 @@
                     android:padding="10dp"
                     android:text="Пример"
                     android:textAppearance="?attr/textAppearanceTitleMedium"
-                    tools:ignore="HardcodedText" />
+                    />
 
             </LinearLayout>
 

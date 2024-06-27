@@ -47,28 +47,27 @@ import ru.jaromirchernyavsky.youniverse.adapters.EditCardAdapter;
 import ru.jaromirchernyavsky.youniverse.adapters.WorldCardAdapter;
 
 public class card_info extends AppCompatActivity implements TextWatcher {
-    String name;
-    Uri pfp;
-    JSONObject data;
-
-    String description;
-    String firstMessage;
-    String scenario;
-    String exampleMessages;
-    ArrayList<Card> cards = new ArrayList<>();
-    EditCardAdapter editCardAdapter;
-    TextInputLayout til_name;
-    TextInputLayout til_summary;
-    ImageView image;
-    TextInputLayout til_first_message;
-    TextInputLayout til_scenario;
-    TextInputLayout til_example;
-    FrameLayout frameLayout;
-    RecyclerView recyclerView;
-    LinearLayout linearLayout;
-    CircularProgressButton btn;
-    boolean world;
-    final ActivityResultLauncher<Intent> pickImage = registerForActivityResult(
+    private String name;
+    private Uri pfp;
+    private JSONObject data;
+    private String description;
+    private String firstMessage;
+    private String scenario;
+    private String exampleMessages;
+    private ArrayList<Card> cards = new ArrayList<>();
+    private EditCardAdapter editCardAdapter;
+    private TextInputLayout til_name;
+    private TextInputLayout til_summary;
+    private ImageView image;
+    private TextInputLayout til_first_message;
+    private TextInputLayout til_scenario;
+    private TextInputLayout til_example;
+    private FrameLayout frameLayout;
+    private RecyclerView recyclerView;
+    private LinearLayout linearLayout;
+    private CircularProgressButton btn;
+    private boolean world;
+    private final ActivityResultLauncher<Intent> pickImage = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
                 @Override
@@ -76,6 +75,8 @@ public class card_info extends AppCompatActivity implements TextWatcher {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         // There are no request codes
                         Intent data = result.getData();
+                        image.setImageTintMode(null);
+                        findViewById(R.id.text_add).setVisibility(View.GONE);
                         pfp = Objects.requireNonNull(data).getData();
                         image.setImageURI(pfp);
                         try {
@@ -282,7 +283,7 @@ bar.setDisplayHomeAsUpEnabled(true);
         alert.setNegativeButton("Нет",(dialog, which) -> {});
         return alert;
     }
-    public void toggleEdits(){
+    private void toggleEdits(){
         boolean enable = !til_name.isEnabled();
         til_summary.setEnabled(enable);
         til_first_message.setEnabled(enable);

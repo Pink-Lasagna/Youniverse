@@ -8,5 +8,5 @@
         android:orderInCategory="100"
         app:showAsAction="always"
         android:title="add"
-        tools:ignore="HardcodedText" />
+        />
 </menu>

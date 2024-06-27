@@ -7,6 +7,7 @@
     tools:context=".CreateCard">
 
     <ScrollView
+        android:id="@+id/scrollView2"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="10dp"
@@ -26,10 +27,10 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="12dp"
                 android:fontFamily="monospace"
-                android:text="Создание карточки"
+                android:text="@string/create_card"
                 android:textAlignment="center"
                 android:textSize="24sp"
-                tools:ignore="HardcodedText" />
+                />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -42,9 +43,9 @@
                     android:layout_height="46dp"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:src="@drawable/account"
                     android:contentDescription="Персонаж"
-                    tools:ignore="HardcodedText" />
+                    android:src="@drawable/account"
+                    />
 
                 <com.google.android.material.materialswitch.MaterialSwitch
                     android:id="@+id/switchView"
@@ -59,41 +60,61 @@
                     android:layout_height="46dp"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:src="@drawable/earth"
                     android:contentDescription="Мир"
-                    tools:ignore="HardcodedText" />
+                    android:src="@drawable/earth"
+                    />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
+                android:layout_height="170dp"
                 android:orientation="horizontal">
-
+                <RelativeLayout
+                android:layout_width="150dp"
+                android:layout_height="170dp">
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/image"
                     android:layout_width="150dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="150dp"
                     android:maxWidth="150dp"
                     android:maxHeight="150dp"
+                    android:tintMode="multiply"
+                    android:tint="@color/md_theme_outline"
                     android:minWidth="150dp"
                     android:minHeight="150dp"
                     android:scaleType="centerCrop"
                     android:src="@mipmap/ic_launcher"
                     app:shapeAppearance="@style/ShapeAppearanceOverlay.Material3.Chip" />
-
+                <TextView
+                    android:id="@+id/text_add"
+                    android:textColor="@color/white"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textStyle="bold"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:text="@string/add_image"/>
+                <TextView
+                    android:gravity="bottom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:textColor="@color/red"
+                    android:text="@string/req"/>
+            </RelativeLayout>
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
                     android:layout_marginStart="10dp"
-                    android:hint="Имя"
+                    android:hint="@string/name_pers"
                     app:counterEnabled="true"
                     app:counterMaxLength="20"
-                    app:helperText="* Обязательное поле"
+                    app:helperText="@string/req"
                     app:helperTextEnabled="true"
                     app:helperTextTextColor="@color/red"
-                    tools:ignore="HardcodedText">
+                    >
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
@@ -107,11 +128,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:hint="Общие черты"
-                app:helperText="* Обязательное поле"
+                android:hint="@string/descr_pers"
+                app:helperText="@string/req"
                 app:helperTextEnabled="true"
                 app:helperTextTextColor="@color/red"
-                tools:ignore="HardcodedText">
+                >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -124,11 +145,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:hint="Приветствие"
-                app:helperText="* Обязательное поле"
+                android:hint="@string/first_mes_text"
+                app:helperText="@string/req"
                 app:helperTextEnabled="true"
                 app:helperTextTextColor="@color/red"
-                tools:ignore="HardcodedText">
+                >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -141,8 +162,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:hint="Сценарий"
-                tools:ignore="HardcodedText">
+                android:hint="@string/scenario_text"
+                >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -155,8 +176,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:hint="Пример сообщений"
-                tools:ignore="HardcodedText">
+                android:hint="@string/example_text"
+                >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -176,9 +197,9 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Добавьте персонажей:"
+                    android:text="@string/action_add_char"
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    tools:ignore="HardcodedText" />
+                    />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/cards"
@@ -190,13 +211,13 @@
 
                 <TextView
                     android:id="@+id/MoreCards"
-                    android:visibility="gone"
                     android:layout_width="wrap_content"
-                    android:layout_marginTop="50dp"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     android:layout_height="wrap_content"
-                    android:text="Создайте персонажей, чтобы увидеть их здесь"
-                    tools:ignore="HardcodedText" />
+                    android:layout_marginTop="50dp"
+                    android:text="@string/add_char"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:visibility="gone"
+                    />
             </LinearLayout>
 
         </LinearLayout>
@@ -209,7 +230,7 @@
         android:layout_gravity="center"
         android:background="@color/main"
         android:enabled="false"
-        android:text="Создать"
+        android:text="@string/create_btn"
         style="?selectableItemBackground"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -217,6 +238,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:spinning_bar_padding="6dp"
         app:spinning_bar_width="4dp"
-        tools:ignore="HardcodedText" />
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

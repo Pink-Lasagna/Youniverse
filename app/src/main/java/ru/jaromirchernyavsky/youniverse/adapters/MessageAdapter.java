@@ -15,8 +15,8 @@ import ru.jaromirchernyavsky.youniverse.ChatMessage;
 import ru.jaromirchernyavsky.youniverse.R;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
-    final ArrayList<ChatMessage> messages;
-    final boolean clickable;
+    private final ArrayList<ChatMessage> messages;
+    private final boolean clickable;
     public MessageAdapter(ArrayList<ChatMessage> messages, boolean clickable){
         this.messages = messages;
         this.clickable = clickable;

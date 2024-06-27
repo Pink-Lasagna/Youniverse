@@ -37,7 +37,7 @@
                     style="?selectableItemBackground"
                     android:src="@drawable/baseline_delete_24"
                     android:contentDescription="Удалить чат"
-                    tools:ignore="HardcodedText" />
+                    />
                 <ImageButton
                     android:id="@+id/chat"
                     android:padding="3dp"
@@ -48,7 +48,7 @@
                     android:background="@color/main"
                     android:src="@drawable/message"
                     android:contentDescription="Перейти в чат"
-                    tools:ignore="HardcodedText" />
+                    />
             </LinearLayout>
 
         </LinearLayout>

@@ -23,14 +23,14 @@ import java.util.Objects;
 import ru.jaromirchernyavsky.youniverse.adapters.ChatsAdapter;
 
 public class ViewChats extends AppCompatActivity implements View.OnClickListener {
-    ChatsAdapter chatsAdapter;
-    ArrayList<ArrayList<ChatMessage>> chatMessages = new ArrayList<>();
-    String name;
-    Uri pfp;
-    String data;
-    String firstMessage;
-    boolean world;
-    String TAG;
+    private ChatsAdapter chatsAdapter;
+    private ArrayList<ArrayList<ChatMessage>> chatMessages = new ArrayList<>();
+    private String name;
+    private Uri pfp;
+    private String data;
+    private String firstMessage;
+    private boolean world;
+    private String TAG;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
