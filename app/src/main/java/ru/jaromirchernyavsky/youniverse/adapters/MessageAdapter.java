@@ -1,14 +1,19 @@
 package ru.jaromirchernyavsky.youniverse.adapters;
 
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 
 import ru.jaromirchernyavsky.youniverse.ChatMessage;
@@ -36,6 +41,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.message.setText(messages.get(position).getSpannable());
+        String pfp = messages.get(position).getPfp();
+        File file = new File(Uri.parse(pfp).getPath());
+        if (file.exists()) holder.pfp.setImageURI(Uri.parse(pfp));
     }
 
     @Override
@@ -53,9 +61,11 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
     static class ViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
         public final TextView message;
+        public final ImageView pfp;
 
         public ViewHolder(View itemView, boolean clicklable) {
             super(itemView);
+            pfp = itemView.findViewById(R.id.pfp);
             message = itemView.findViewById(R.id.message);
             if(clicklable) itemView.setOnCreateContextMenuListener(this);
         }

@@ -88,7 +88,7 @@ public class ViewChats extends AppCompatActivity implements View.OnClickListener
     }
     public ArrayList<ChatMessage> createStartMessage(){
         ArrayList<ChatMessage> defchat = new ArrayList<>();
-        defchat.add(new ChatMessage("assistant",firstMessage));
+        defchat.add(new ChatMessage("assistant",firstMessage,pfp));
         chatsAdapter.notifyItemInserted(chatMessages.size());
         return defchat;
     }
@@ -108,7 +108,7 @@ public class ViewChats extends AppCompatActivity implements View.OnClickListener
         intent.putExtra("uri", pfp);
         intent.putExtra("data", data);
         intent.putExtra("userPersona", "human");
-        intent.putExtra("chatid", chatsAdapter.getPos());
+        intent.putExtra("chatID", chatsAdapter.getPos());
         intent.putExtra("world", world);
         this.startActivity(intent);
     }

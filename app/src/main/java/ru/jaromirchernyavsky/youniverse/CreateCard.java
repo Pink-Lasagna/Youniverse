@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -43,6 +45,7 @@ import java.util.Random;
 
 import ar.com.hjg.pngj.PngjInputException;
 import ru.jaromirchernyavsky.youniverse.adapters.EditCardAdapter;
+import ru.jaromirchernyavsky.youniverse.custom.AIWriter;
 
 public class CreateCard extends AppCompatActivity implements View.OnClickListener, TextWatcher {
     private boolean world = false;
@@ -117,17 +120,6 @@ public class CreateCard extends AppCompatActivity implements View.OnClickListene
     private TextInputLayout example;
     private MaterialSwitch materialSwitch;
     private LinearLayout worldlayout;
-    private long delay = 1000; // 1 seconds after user stops typing
-    private long last_text_edit = 0;
-    private Handler handler = new Handler();
-
-    private Runnable input_finish_checker = new Runnable() {
-        public void run() {
-            if (System.currentTimeMillis() > (last_text_edit + delay - 500)) {
-
-            }
-        }
-    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -138,6 +130,7 @@ public class CreateCard extends AppCompatActivity implements View.OnClickListene
         bar.setBackgroundDrawable(new ColorDrawable(getColor(R.color.main)));
         bar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_new_24);
         setContentView(R.layout.activity_create);
+        ImageButton magic =  findViewById(R.id.buttonmagic);
         image = findViewById(R.id.image);
         image.setOnClickListener(v -> {
             //Check permission, if no ask for, if granted launch activity
@@ -173,6 +166,21 @@ public class CreateCard extends AppCompatActivity implements View.OnClickListene
         Objects.requireNonNull(first_message.getEditText()).addTextChangedListener(this);
         scenario = findViewById(R.id.Scenario);
         example = findViewById(R.id.Primer);
+        name.getEditText().setOnFocusChangeListener(new AIWriter(magic,name.getHint()));
+        name.getEditText().addTextChangedListener((TextWatcher) name.getEditText().getOnFocusChangeListener());
+
+        summary.getEditText().setOnFocusChangeListener(new AIWriter(magic,summary.getHint()));
+        summary.getEditText().addTextChangedListener((TextWatcher) summary.getEditText().getOnFocusChangeListener());
+
+        first_message.getEditText().setOnFocusChangeListener(new AIWriter(magic,first_message.getHint()));
+        first_message.getEditText().addTextChangedListener((TextWatcher) first_message.getEditText().getOnFocusChangeListener());
+
+        scenario.getEditText().setOnFocusChangeListener(new AIWriter(magic,scenario.getHint()));
+        scenario.getEditText().addTextChangedListener((TextWatcher) scenario.getEditText().getOnFocusChangeListener());
+
+        example.getEditText().setOnFocusChangeListener(new AIWriter(magic,example.getHint()));
+        example.getEditText().addTextChangedListener((TextWatcher) example.getEditText().getOnFocusChangeListener());
+
         RecyclerView recyclerView = findViewById(R.id.cards);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
@@ -251,17 +259,10 @@ public class CreateCard extends AppCompatActivity implements View.OnClickListene
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        handler.removeCallbacks(input_finish_checker);
         btn.setEnabled(Objects.requireNonNull(name.getEditText()).getText().toString().length()<=20&&imageuri!=null&&!Objects.requireNonNull(name.getEditText()).getText().toString().isEmpty() && !Objects.requireNonNull(summary.getEditText()).getText().toString().isEmpty() && !Objects.requireNonNull(first_message.getEditText()).getText().toString().isEmpty());
     }
 
     @Override
     public void afterTextChanged(Editable s) {
-        if (s.length() > 0) {
-            last_text_edit = System.currentTimeMillis();
-            handler.postDelayed(input_finish_checker, delay);
-        } else {
-
-        }
     }
 }

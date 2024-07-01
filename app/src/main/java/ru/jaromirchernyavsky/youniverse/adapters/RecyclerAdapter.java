@@ -3,9 +3,7 @@ package ru.jaromirchernyavsky.youniverse.adapters;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -25,7 +23,7 @@ import java.util.ArrayList;
 import ru.jaromirchernyavsky.youniverse.Card;
 import ru.jaromirchernyavsky.youniverse.R;
 import ru.jaromirchernyavsky.youniverse.Utilities;
-import ru.jaromirchernyavsky.youniverse.card_info;
+import ru.jaromirchernyavsky.youniverse.CardInfo;
 import ru.jaromirchernyavsky.youniverse.custom.DeleteConfirmation;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
@@ -46,7 +44,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         holder.name.setText(cards.get(position).name);
         holder.description.setText(cards.get(position).description);
         holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(v.getContext(), card_info.class);
+            Intent intent = new Intent(v.getContext(), CardInfo.class);
             intent.putExtra("name",cards.get(holder.getAdapterPosition()).name);
             intent.putExtra("uri",cards.get(holder.getAdapterPosition()).uri);
             intent.putExtra("data",cards.get(holder.getAdapterPosition()).convertedData.toString());

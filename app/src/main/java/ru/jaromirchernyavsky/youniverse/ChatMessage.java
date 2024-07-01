@@ -1,6 +1,7 @@
 package ru.jaromirchernyavsky.youniverse;
 
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -13,10 +14,12 @@ import org.apache.commons.text.StringEscapeUtils;
 public class ChatMessage {
     private final String role;
     private String text;
+    private String pfp;
 
-    public ChatMessage(String role, String text) {
+    public ChatMessage(String role, String text, Object pfp) {
         this.role = role;
         this.text = text;
+        this.pfp = pfp.toString();
     }
 
     public String getRole() {
@@ -57,7 +60,12 @@ public class ChatMessage {
     @NonNull
     @Override
     public String toString() {
-        return "{\"role\":\"" + role + "\",\"content\":\"" + StringEscapeUtils.escapeJava(text) + "\"}";
+        if(role=="assistant"||role=="system"||role=="user")
+            return "{\"role\":\"" + role + "\",\"content\":\"" + StringEscapeUtils.escapeJava(text) + "\"}";
+        return  "{\"role\":\"assistant\",\"content\":\""+role+":" + StringEscapeUtils.escapeJava(text) + "\"}";
     }
 
+    public String getPfp() {
+        return pfp;
+    }
 }

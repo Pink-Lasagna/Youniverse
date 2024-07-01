@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".card_info">
+    tools:context=".CardInfo">
 
     <ScrollView
         android:layout_width="0dp"
@@ -34,8 +34,6 @@
                         android:layout_height="150dp"
                         android:maxWidth="150dp"
                         android:maxHeight="150dp"
-                        android:tintMode="multiply"
-                        android:tint="@color/md_theme_outline"
                         android:minWidth="150dp"
                         android:minHeight="150dp"
                         android:scaleType="centerCrop"
@@ -46,6 +44,7 @@
                         android:textColor="@color/white"
                         android:textAlignment="center"
                         android:gravity="center"
+                        android:visibility="gone"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                         android:textStyle="bold"
                         android:layout_width="match_parent"
@@ -208,11 +207,44 @@
             />
 
     </LinearLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        android:backgroundTint="@color/main"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:visibility="visible">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:elegantTextHeight="true"
+            android:hint="Напишите запрос ИИ"
+            android:paddingRight="55dp"
+            android:layout_alignParentEnd="true"
+            android:paddingLeft="10dp"
+            android:background="@drawable/background_magic"
+            android:backgroundTint="@color/main"
+            android:visibility="gone"
+            tools:visibility="gone"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/buttonmagic"
+            android:layout_width="wrap_content"
+            app:elevation="0dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:backgroundTint="@color/md_theme_outlineVariant"
+            android:src="@drawable/baseline_auto_awesome_24" />
+    </RelativeLayout>
 
     <FrameLayout
+        android:id="@+id/btn_layout"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:id="@+id/btn_layout"
         android:background="@color/main"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -229,8 +261,7 @@
             android:text="@string/save_btn"
             android:textStyle="bold"
             app:spinning_bar_color="@color/white"
-            app:spinning_bar_padding="5dp"
-            />
+            app:spinning_bar_padding="5dp" />
     </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

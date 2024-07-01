@@ -5,32 +5,37 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="end"
-    android:padding="5dp"
+    android:padding="10dp"
     android:paddingStart="50dp"
     tools:ignore="RtlSymmetry">
 
-    <FrameLayout
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:gravity="end"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/material_dynamic_neutral_variant20"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearance="@style/ShapeAppearanceOverlay.Material3.Chip" />
+
 
         <TextView
+            android:padding="8dp"
+            android:layout_gravity="top"
+            android:background="@drawable/background_search"
             android:id="@+id/message"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="10dp"
-            android:text="Messaege"
-            />
-    </FrameLayout>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Messaege" />
+        <com.google.android.material.imageview.ShapeableImageView
+            android:layout_width="35dp"
+            android:layout_marginStart="5dp"
+            android:id="@+id/pfp"
+            app:shapeAppearance="@style/ShapeAppearanceOverlay.Material3.Chip"
+            android:layout_height="35dp"
+            android:scaleType="centerCrop"
+            android:src="@mipmap/ic_launcher"/>
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

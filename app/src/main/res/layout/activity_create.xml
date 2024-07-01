@@ -29,8 +29,7 @@
                 android:fontFamily="monospace"
                 android:text="@string/create_card"
                 android:textAlignment="center"
-                android:textSize="24sp"
-                />
+                android:textSize="24sp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -44,8 +43,7 @@
                     android:layout_gravity="center"
                     android:layout_weight="1"
                     android:contentDescription="Персонаж"
-                    android:src="@drawable/account"
-                    />
+                    android:src="@drawable/account" />
 
                 <com.google.android.material.materialswitch.MaterialSwitch
                     android:id="@+id/switchView"
@@ -61,47 +59,51 @@
                     android:layout_gravity="center"
                     android:layout_weight="1"
                     android:contentDescription="Мир"
-                    android:src="@drawable/earth"
-                    />
+                    android:src="@drawable/earth" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="170dp"
                 android:orientation="horizontal">
+
                 <RelativeLayout
-                android:layout_width="150dp"
-                android:layout_height="170dp">
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/image"
                     android:layout_width="150dp"
-                    android:layout_height="150dp"
-                    android:maxWidth="150dp"
-                    android:maxHeight="150dp"
-                    android:tintMode="multiply"
-                    android:tint="@color/md_theme_outline"
-                    android:minWidth="150dp"
-                    android:minHeight="150dp"
-                    android:scaleType="centerCrop"
-                    android:src="@mipmap/ic_launcher"
-                    app:shapeAppearance="@style/ShapeAppearanceOverlay.Material3.Chip" />
-                <TextView
-                    android:id="@+id/text_add"
-                    android:textColor="@color/white"
-                    android:textAlignment="center"
-                    android:gravity="center"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textStyle="bold"
-                    android:layout_width="match_parent"
-                    android:layout_height="150dp"
-                    android:text="@string/add_image"/>
-                <TextView
-                    android:gravity="bottom"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:textColor="@color/red"
-                    android:text="@string/req"/>
-            </RelativeLayout>
+                    android:layout_height="170dp">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/image"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:maxWidth="150dp"
+                        android:maxHeight="150dp"
+                        android:minWidth="150dp"
+                        android:minHeight="150dp"
+                        android:scaleType="centerCrop"
+                        android:src="@mipmap/ic_launcher"
+                        android:tint="@color/md_theme_outline"
+                        android:tintMode="multiply"
+                        app:shapeAppearance="@style/ShapeAppearanceOverlay.Material3.Chip" />
+
+                    <TextView
+                        android:id="@+id/text_add"
+                        android:layout_width="match_parent"
+                        android:layout_height="150dp"
+                        android:gravity="center"
+                        android:text="@string/add_image"
+                        android:textAlignment="center"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:textColor="@color/white"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="bottom"
+                        android:text="@string/req"
+                        android:textColor="@color/red" />
+                </RelativeLayout>
+
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/name"
                     android:layout_width="match_parent"
@@ -113,12 +115,13 @@
                     app:counterMaxLength="20"
                     app:helperText="@string/req"
                     app:helperTextEnabled="true"
-                    app:helperTextTextColor="@color/red"
-                    >
+                    app:helperTextTextColor="@color/red">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
+
+
 
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
@@ -131,8 +134,7 @@
                 android:hint="@string/descr_pers"
                 app:helperText="@string/req"
                 app:helperTextEnabled="true"
-                app:helperTextTextColor="@color/red"
-                >
+                app:helperTextTextColor="@color/red">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -148,8 +150,7 @@
                 android:hint="@string/first_mes_text"
                 app:helperText="@string/req"
                 app:helperTextEnabled="true"
-                app:helperTextTextColor="@color/red"
-                >
+                app:helperTextTextColor="@color/red">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -162,8 +163,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:hint="@string/scenario_text"
-                >
+                android:hint="@string/scenario_text">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -176,8 +176,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:hint="@string/example_text"
-                >
+                android:hint="@string/example_text">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -198,8 +197,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/action_add_char"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/cards"
@@ -216,12 +214,46 @@
                     android:layout_marginTop="50dp"
                     android:text="@string/add_char"
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                    android:visibility="gone"
-                    />
+                    android:visibility="gone" />
             </LinearLayout>
-
         </LinearLayout>
+
     </ScrollView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        android:backgroundTint="@color/main"
+        app:layout_constraintBottom_toTopOf="@+id/CreateButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:visibility="visible">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:elegantTextHeight="true"
+            android:hint="Напишите запрос ИИ"
+            android:paddingRight="55dp"
+            android:layout_alignParentEnd="true"
+            android:paddingLeft="10dp"
+            android:background="@drawable/background_magic"
+            android:backgroundTint="@color/main"
+            android:visibility="gone"
+            tools:visibility="gone"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/buttonmagic"
+            android:layout_width="wrap_content"
+            app:elevation="0dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:backgroundTint="@color/md_theme_outlineVariant"
+            android:src="@drawable/baseline_auto_awesome_24" />
+    </RelativeLayout>
+
 
     <com.github.leandroborgesferreira.loadingbutton.customViews.CircularProgressButton
         android:id="@+id/CreateButton"
@@ -239,5 +271,7 @@
         app:spinning_bar_padding="6dp"
         app:spinning_bar_width="4dp"
         />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

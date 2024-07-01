@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_marginRight="5dp"
+    android:layout_gravity="center"
+    android:layout_height="wrap_content">
+    <com.google.android.material.imageview.ShapeableImageView
+        android:layout_width="35dp"
+        android:id="@+id/pfp"
+        app:shapeAppearance="@style/ShapeAppearanceOverlay.Material3.Chip"
+        android:layout_height="35dp"
+        android:scaleType="centerCrop"
+        android:src="@mipmap/ic_launcher"/>
+</FrameLayout>

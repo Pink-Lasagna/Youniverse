@@ -15,6 +15,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -45,24 +46,21 @@ import java.util.Objects;
 import ar.com.hjg.pngj.PngjInputException;
 import ru.jaromirchernyavsky.youniverse.adapters.EditCardAdapter;
 import ru.jaromirchernyavsky.youniverse.adapters.WorldCardAdapter;
+import ru.jaromirchernyavsky.youniverse.custom.AIWriter;
 
-public class card_info extends AppCompatActivity implements TextWatcher {
-    private String name;
+public class CardInfo extends AppCompatActivity implements TextWatcher {
     private Uri pfp;
     private JSONObject data;
-    private String description;
-    private String firstMessage;
-    private String scenario;
-    private String exampleMessages;
     private ArrayList<Card> cards = new ArrayList<>();
     private EditCardAdapter editCardAdapter;
-    private TextInputLayout til_name;
-    private TextInputLayout til_summary;
+    private TextInputLayout name;
+    private TextInputLayout summary;
     private ImageView image;
-    private TextInputLayout til_first_message;
-    private TextInputLayout til_scenario;
-    private TextInputLayout til_example;
+    private TextInputLayout first_message;
+    private TextInputLayout scenario;
+    private TextInputLayout example;
     private FrameLayout frameLayout;
+    private ImageButton magic;
     private RecyclerView recyclerView;
     private LinearLayout linearLayout;
     private CircularProgressButton btn;
@@ -75,8 +73,6 @@ public class card_info extends AppCompatActivity implements TextWatcher {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         // There are no request codes
                         Intent data = result.getData();
-                        image.setImageTintMode(null);
-                        findViewById(R.id.text_add).setVisibility(View.GONE);
                         pfp = Objects.requireNonNull(data).getData();
                         image.setImageURI(pfp);
                         try {
@@ -98,14 +94,14 @@ public class card_info extends AppCompatActivity implements TextWatcher {
                                 if(jsonCards.size()==0) jsonCards=null;
                                 if(jsonCards!=null){
                                     world = true;
-                                    til_name.setHint("Имя");
-                                    til_summary.setHint("Описание");
+                                    name.setHint("Имя");
+                                    summary.setHint("Описание");
                                     linearLayout.setVisibility(View.GONE);
                                     cards = jsonCards;
                                 } else{
                                     world = false;
-                                    til_name.setHint("Название");
-                                    til_summary.setHint("Сюжет мира");
+                                    name.setHint("Название");
+                                    summary.setHint("Сюжет мира");
                                     linearLayout.setVisibility(View.VISIBLE);
                                 }
                             });
@@ -114,7 +110,7 @@ public class card_info extends AppCompatActivity implements TextWatcher {
                             throw new RuntimeException(e);
                         } catch (PngjInputException ignored){
                         }
-                        btn.setEnabled(pfp!=null&&!Objects.requireNonNull(til_name.getEditText()).getText().toString().isEmpty() && !Objects.requireNonNull(til_summary.getEditText()).getText().toString().isEmpty() && !Objects.requireNonNull(til_first_message.getEditText()).getText().toString().isEmpty());
+                        btn.setEnabled(pfp!=null&&!Objects.requireNonNull(name.getEditText()).getText().toString().isEmpty() && !Objects.requireNonNull(summary.getEditText()).getText().toString().isEmpty() && !Objects.requireNonNull(first_message.getEditText()).getText().toString().isEmpty());
                     }
                 }
             });
@@ -127,53 +123,37 @@ public class card_info extends AppCompatActivity implements TextWatcher {
         ActionBar bar = getSupportActionBar();
         Objects.requireNonNull(bar).setDisplayShowTitleEnabled(false);
         bar.setBackgroundDrawable(new ColorDrawable(getColor(R.color.main)));
-bar.setDisplayHomeAsUpEnabled(true);
+        bar.setDisplayHomeAsUpEnabled(true);
         bar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_new_24);
         setContentView(R.layout.activity_card_info);
-        til_name = findViewById(R.id.name);
-        til_summary = findViewById(R.id.Summary);
-        til_first_message = findViewById(R.id.first_message);
-        til_scenario = findViewById(R.id.Scenario);
-        til_example = findViewById(R.id.Primer);
+        name = findViewById(R.id.name);
+        summary = findViewById(R.id.Summary);
+        first_message = findViewById(R.id.first_message);
+        scenario = findViewById(R.id.Scenario);
+        example = findViewById(R.id.Primer);
         frameLayout = findViewById(R.id.btn_layout);
         image = findViewById(R.id.image);
+        magic = findViewById(R.id.buttonmagic);
         linearLayout = findViewById(R.id.worldGroup);
         btn = findViewById(R.id.CreateButton);
         ImageButton btn_edit = findViewById(R.id.edit);
         findViewById(R.id.cards);
+
+
         ImageButton btn_chat = findViewById(R.id.chat);
         recyclerView = findViewById(R.id.cards);
         initEdits();
-        image.setOnClickListener(v -> {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                if(checkSelfPermission(android.Manifest.permission.READ_MEDIA_IMAGES)== PackageManager.PERMISSION_DENIED){
-                    String[] permissions;
-                    permissions = new String[]{android.Manifest.permission.READ_MEDIA_IMAGES};
-                    requestPermissions(permissions,PERMISSION_CODE);
-                } else{
-                    pickImageFromGallery();
-                }
-            } else{
-                if(checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_DENIED){
-                    String[] permissions;
-                    permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
-                    requestPermissions(permissions,PERMISSION_CODE);
-                } else{
-                    pickImageFromGallery();
-                }
-            }
-        });
-        Objects.requireNonNull(til_name.getEditText()).addTextChangedListener(this);
-        Objects.requireNonNull(til_summary.getEditText()).addTextChangedListener(this);
-        Objects.requireNonNull(til_first_message.getEditText()).addTextChangedListener(this);
-        Objects.requireNonNull(til_scenario.getEditText()).addTextChangedListener(this);
-        Objects.requireNonNull(til_example.getEditText()).addTextChangedListener(this);
+        Objects.requireNonNull(name.getEditText()).addTextChangedListener(this);
+        Objects.requireNonNull(summary.getEditText()).addTextChangedListener(this);
+        Objects.requireNonNull(first_message.getEditText()).addTextChangedListener(this);
+        Objects.requireNonNull(scenario.getEditText()).addTextChangedListener(this);
+        Objects.requireNonNull(example.getEditText()).addTextChangedListener(this);
         btn_chat.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), ViewChats.class);
-            intent.putExtra("name",name);
+            intent.putExtra("name",name.getEditText().getText().toString());
             intent.putExtra("uri",pfp);
             intent.putExtra("data",data.toString());
-            intent.putExtra("firstMessage",firstMessage);
+            intent.putExtra("firstMessage",first_message.getEditText().getText().toString());
             intent.putExtra("userPersona","human");
             intent.putExtra("world",world);
             v.getContext().startActivity(intent);
@@ -185,10 +165,10 @@ bar.setDisplayHomeAsUpEnabled(true);
             new File(Objects.requireNonNull(pfp.getPath())).delete();
             String metadata;
             if(world){
-                metadata = Utilities.generateMetadata(this,til_summary,til_first_message,til_example,til_name,til_scenario,editCardAdapter.getAdded());
+                metadata = Utilities.generateMetadata(this,summary,first_message,example,name,scenario,editCardAdapter.getAdded());
                 cards = editCardAdapter.getAdded();
             } else{
-                metadata = Utilities.generateMetadata(this,til_summary,til_first_message,til_example,til_name,til_scenario, new ArrayList<>());
+                metadata = Utilities.generateMetadata(this,summary,first_message,example,name,scenario, new ArrayList<>());
             }
             Utilities.saveCard(this,finalBitmap,metadata,pfp.getLastPathSegment(),world,true);
             toggleEdits();
@@ -201,25 +181,27 @@ bar.setDisplayHomeAsUpEnabled(true);
         pickImage.launch(intent);
     }
     private void setEdits(String name, String summary, String firstMessage, String scenario, String example){
-        Objects.requireNonNull(til_name.getEditText()).setText(name);
-        Objects.requireNonNull(til_summary.getEditText()).setText(summary);
-        Objects.requireNonNull(til_first_message.getEditText()).setText(firstMessage);
-        Objects.requireNonNull(til_scenario.getEditText()).setText(scenario);
-        Objects.requireNonNull(til_example.getEditText()).setText(example);
+        Objects.requireNonNull(this.name.getEditText()).setText(name);
+        Objects.requireNonNull(this.summary.getEditText()).setText(summary);
+        Objects.requireNonNull(first_message.getEditText()).setText(firstMessage);
+        Objects.requireNonNull(this.scenario.getEditText()).setText(scenario);
+        Objects.requireNonNull(this.example.getEditText()).setText(example);
+        btn.requestFocus();
+
     }
 
     /** @noinspection ResultOfMethodCallIgnored*/
     private void initEdits(){
         try {
             data = new JSONObject(Objects.requireNonNull(getIntent().getStringExtra("data")));
-            description = data.getString("description");
-            firstMessage = data.getString("first_mes");
-            scenario = data.getString("scenario");
-            name = getIntent().getStringExtra("name");
+            String description = data.getString("description");
+            String firstMessage = data.getString("first_mes");
+            String scenariostr = data.getString("scenario");
+            String namestr = getIntent().getStringExtra("name");
             pfp = getIntent().getParcelableExtra("uri");
-            exampleMessages = data.getString("mes_example");
+            String exampleMessages = data.getString("mes_example");
             world = getIntent().getBooleanExtra("world",false);
-            setEdits(name,description,firstMessage,scenario,exampleMessages);
+            setEdits(namestr, description,firstMessage, scenariostr, exampleMessages);
             image.setImageURI(pfp);
             if(world) {
                 LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -230,13 +212,14 @@ bar.setDisplayHomeAsUpEnabled(true);
                     cards.remove(null);
                     Bitmap finalBitmap = Utilities.getContactBitmapFromURI(this,pfp);
                     new File(Objects.requireNonNull(pfp.getPath())).delete();
-                    String metadata = Utilities.generateMetadata(this,til_summary,til_first_message,til_example,til_name,til_scenario, new ArrayList<>());
+                    String metadata = Utilities.generateMetadata(this,summary,first_message,example,name,scenario, new ArrayList<>());
                     Utilities.saveCard(this,finalBitmap,metadata,pfp.getLastPathSegment(),world,false);
                 }
                 linearLayout.setVisibility(View.VISIBLE);
                 WorldCardAdapter worldCardAdapter = new WorldCardAdapter(cards);
                 recyclerView.setAdapter(worldCardAdapter);
             }
+            btn.requestFocus();
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
@@ -246,13 +229,13 @@ bar.setDisplayHomeAsUpEnabled(true);
         int id = item.getItemId();
 
         if (id == android.R.id.home) {
-            if(til_name.isEnabled()){
+            if(name.isEnabled()){
                 new MaterialAlertDialogBuilder(this)
                         .setTitle("Вы уверены, что хотите прекратить редактировать?")
                         .setMessage("Все изменения будут потеряны")
                         .setNegativeButton("Да",(dialog, which) -> {
-                            initEdits();
-                            toggleEdits();
+                            getOnBackPressedDispatcher().onBackPressed();
+
                         })
                         .setPositiveButton("Нет",(dialog, which) -> {
                         }).show();
@@ -284,12 +267,55 @@ bar.setDisplayHomeAsUpEnabled(true);
         return alert;
     }
     private void toggleEdits(){
-        boolean enable = !til_name.isEnabled();
-        til_summary.setEnabled(enable);
-        til_first_message.setEnabled(enable);
-        til_scenario.setEnabled(enable);
-        til_example.setEnabled(enable);
+        boolean enable = !name.isEnabled();
+        summary.setEnabled(enable);
+        first_message.setEnabled(enable);
+        scenario.setEnabled(enable);
+        example.setEnabled(enable);
         frameLayout.setVisibility(enable?View.VISIBLE:View.GONE);
+        if(enable){
+
+            name.getEditText().setOnFocusChangeListener(new AIWriter(magic,name.getHint()));
+            name.getEditText().addTextChangedListener((TextWatcher) name.getEditText().getOnFocusChangeListener());
+
+            summary.getEditText().setOnFocusChangeListener(new AIWriter(magic,summary.getHint()));
+            summary.getEditText().addTextChangedListener((TextWatcher) summary.getEditText().getOnFocusChangeListener());
+
+            first_message.getEditText().setOnFocusChangeListener(new AIWriter(magic,first_message.getHint()));
+            first_message.getEditText().addTextChangedListener((TextWatcher) first_message.getEditText().getOnFocusChangeListener());
+
+            scenario.getEditText().setOnFocusChangeListener(new AIWriter(magic,scenario.getHint()));
+            scenario.getEditText().addTextChangedListener((TextWatcher) scenario.getEditText().getOnFocusChangeListener());
+
+            example.getEditText().setOnFocusChangeListener(new AIWriter(magic,example.getHint()));
+            example.getEditText().addTextChangedListener((TextWatcher) example.getEditText().getOnFocusChangeListener());
+            image.setOnClickListener(v -> {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                    if(checkSelfPermission(android.Manifest.permission.READ_MEDIA_IMAGES)== PackageManager.PERMISSION_DENIED){
+                        String[] permissions;
+                        permissions = new String[]{android.Manifest.permission.READ_MEDIA_IMAGES};
+                        requestPermissions(permissions,PERMISSION_CODE);
+                    } else{
+                        pickImageFromGallery();
+                    }
+                } else{
+                    if(checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE)== PackageManager.PERMISSION_DENIED){
+                        String[] permissions;
+                        permissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
+                        requestPermissions(permissions,PERMISSION_CODE);
+                    } else{
+                        pickImageFromGallery();
+                    }
+                }
+            });
+            image.setColorFilter(this.getColor(R.color.md_theme_outline), PorterDuff.Mode.MULTIPLY);
+            findViewById(R.id.text_add).setVisibility(View.VISIBLE);
+        } else{
+
+            image.setOnClickListener(v -> {});
+            image.setColorFilter(null);
+            findViewById(R.id.text_add).setVisibility(View.GONE);
+        }
         if(world){
             if(enable){
                 try {
@@ -304,19 +330,18 @@ bar.setDisplayHomeAsUpEnabled(true);
                 recyclerView.setAdapter(worldCardAdapter);
             }
         }
-        til_name.setEnabled(enable);
+        name.setEnabled(enable);
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-            if(til_name.isEnabled()) {
+            if(name.isEnabled()) {
                 new MaterialAlertDialogBuilder(this)
                         .setTitle("Вы уверены, что хотите прекратить редактировать?")
                         .setMessage("Все изменения будут потеряны")
                         .setNegativeButton("Да", (dialog, which) -> {
-                            initEdits();
-                            toggleEdits();
+                            getOnBackPressedDispatcher().onBackPressed();
                         })
                         .setPositiveButton("Нет", (dialog, which) -> {
                         }).show();
@@ -334,7 +359,7 @@ bar.setDisplayHomeAsUpEnabled(true);
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        btn.setEnabled(Objects.requireNonNull(til_name.getEditText()).getText().toString().length()<=20&&pfp!=null&&!Objects.requireNonNull(til_name.getEditText()).getText().toString().isEmpty() && !Objects.requireNonNull(til_summary.getEditText()).getText().toString().isEmpty() && !Objects.requireNonNull(til_first_message.getEditText()).getText().toString().isEmpty());
+        btn.setEnabled(Objects.requireNonNull(name.getEditText()).getText().toString().length()<=20&&pfp!=null&&!Objects.requireNonNull(name.getEditText()).getText().toString().isEmpty() && !Objects.requireNonNull(summary.getEditText()).getText().toString().isEmpty() && !Objects.requireNonNull(first_message.getEditText()).getText().toString().isEmpty());
     }
 
     @Override

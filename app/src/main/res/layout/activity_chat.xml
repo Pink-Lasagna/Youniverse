@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="bottom"
-        app:layout_constraintBottom_toTopOf="@+id/frameLayout"
+        app:layout_constraintBottom_toTopOf="@+id/smallRecycler"
         app:layout_constraintTop_toBottomOf="@id/appBarLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -37,7 +37,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
-                android:background="@null"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:minWidth="60dp"
                 android:minHeight="60dp"
                 android:src="@drawable/baseline_arrow_back_ios_new_24"
@@ -70,6 +70,19 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/smallRecycler"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:padding="5dp"
+        tools:listitem="@layout/fragment_card_small"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:background="@color/md_theme_onPrimary"
+        app:layout_constraintBottom_toTopOf="@id/frameLayout"
+        android:orientation="horizontal"/>
+
+
     <LinearLayout
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
@@ -80,6 +93,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
+        <ImageButton
+            android:id="@+id/expand"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:padding="15dp"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:layout_gravity="center"
+            android:src="@drawable/baseline_expand_less_24"
+            android:background="?attr/selectableItemBackgroundBorderless"/>
         <EditText
             android:id="@+id/edit"
             style="@style/Widget.Material3.TextInputEditText.OutlinedBox"
@@ -89,7 +112,6 @@
             android:layout_weight="1"
             android:ems="10"
             android:hint="Напишите сообщение..."
-            android:imeOptions="actionSend"
             android:inputType="textMultiLine"
             android:outlineProvider="background"
             android:singleLine="false"
@@ -102,13 +124,20 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"
             android:layout_margin="6dp"
-            android:background="@null"
-            android:backgroundTint="@color/cardview_dark_background"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:minWidth="45dp"
             android:minHeight="45dp"
             android:src="@drawable/send"
             android:contentDescription="Отправить"
             />
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_margin="6dp"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:layout_gravity="center"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

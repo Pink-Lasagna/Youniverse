@@ -26,7 +26,7 @@
             android:configChanges="orientation|screenSize"
             android:theme="@style/Theme.Youniverse.BackButton" />
         <activity
-            android:name=".card_info"
+            android:name=".CardInfo"
             android:exported="false"
             android:configChanges="orientation|screenSize"
             android:theme="@style/Theme.Youniverse.BackButton" />

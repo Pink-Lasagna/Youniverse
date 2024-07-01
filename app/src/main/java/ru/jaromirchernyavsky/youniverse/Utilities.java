@@ -22,12 +22,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,6 +40,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.locks.Condition;
+import java.util.function.Function;
 
 import ar.com.hjg.pngj.IImageLine;
 import ar.com.hjg.pngj.PngReader;
@@ -250,7 +257,6 @@ public class Utilities {
         }
         return chars.substring(0,chars.length()-1);
     }
-
     public static ArrayList<ChatMessage> getStoredMessages(Context context,String TAG,int chatid){
         Gson gson = new Gson();
         SharedPreferences sharedPreferences = context.getSharedPreferences(TAG, 0);
@@ -294,7 +300,8 @@ public class Utilities {
 
 
     public static String charSysPrompt(String name,String description, String scenario, String exampleMessages, String username, String userPersona){
-        return StringEscapeUtils.escapeJava("Притворись персонажем с именем "+name+", вот его краткое описание\n:"+description+"\n Твоя задача - разговаривать с пользователем с именем "+username+", который описан как "+userPersona+
+        return StringEscapeUtils.escapeJava("Притворись персонажем с именем "+name+", вот его краткое описание\n:"+description+"\n " +
+                "Твоя задача - разговаривать с пользователем с именем "+username+", который описан как "+userPersona+
                 ". Ты должен придерживаться следующей предыстории и текущей ситуации:\n Предыстория и сценарий:\n "+scenario+
                 "\nПример сообщений:\n "+exampleMessages+
                 "Ты должен оставаться в образе "+name+" на протяжении всего разговора, учитывать предысторию и текущую ситуацию," +
@@ -312,8 +319,32 @@ public class Utilities {
                         "\"%s\"\n" +
                         "Пример сообщений:\n" +
                         "\"%s\"\n" +
-                        "Ты должен генерировать действия существ, находящихся в мире \"%s\", и описывать последствия действий персонажа \"%s\". Также ты должен вкратце и детализировано описывать сцену вокруг пользователя в данный момент, используя яркие эпитеты и образы. Генерируй речь существ и персонажей, которых встречает пользователь, придавая им уникальные голоса и характерные черты. Обособляй все описания и действия звездочками *, кроме прямой речи персонажей.",
+                        "Ты должен генерировать действия существ, находящихся в мире \"%s\", и описывать последствия действий персонажа \"%s\". " +
+                                "Также ты должен вкратце и детализировано описывать сцену вокруг пользователя в данный момент, используя яркие эпитеты и образы. " +
+                                "Генерируй речь существ и персонажей, которых встречает пользователь, придавая им уникальные голоса и характерные черты. " +
+                                "Обособляй все описания и действия звездочками *, кроме прямой речи персонажей." +
+                                "В прошлых сообщениях могут быть сообщения от других персонажей, ты можешь это увидить, если твое сообщение начинается на \"имя:\"",
                 name, username, userPersona, description, scenario, exampleMessages, name, username));
+    }
+
+    public static String specialCharPrompt(String name,String description, String exampleMessages, String username, String userPersona, Card character) throws JSONException {
+        String charName = character.name;
+        String charDescription = character.description;
+        JSONObject jsonObject = character.convertedData;
+        String charExampleMessages = jsonObject.getString("mes_example");
+        return StringEscapeUtils.escapeJava("Притворись персонажем с именем "+charName+", вот его краткое описание\n:"+charDescription+"\n " +
+                "Твоя задача - разговаривать с пользователем с именем "+username+", который описан как "+userPersona+
+                ".Вы с пользователем в одном мире, вот данные об этом мире:\n" +
+                "Название: " + name+
+                "\nОписание:\n" + description+
+                "\nПример разговоров в этих мирах:\n"+exampleMessages+
+                "\n\n(Дальше идет описание самого персонажа)"+
+                "\nПример твоих сообщений:\n "+charExampleMessages+
+                "\nТы должен оставаться в образе "+charName+" на протяжении всего разговора, учитывать предысторию и текущую ситуацию," +
+                " а также поддерживать стиль и тон сообщений, приведенных в примере. " +
+                "Используй активное слушание, задавай вопросы и поддерживай диалог в рамках заданного сценария и в стиле"+charName+
+                "В каждом своем ответе описывай свои действия и обособляй их звездочками. Например, *улыбается* или *показывает на старинное здание*. " +
+                        "В прошлых сообщениях могут быть сообщения от других персонажей, ты можешь это увидить, если твое сообщение начинается на \"имя:\", но если не было, это был сам мир");
     }
     /** @noinspection ResultOfMethodCallIgnored*/
     public static void addImageToGallery(Context context, Uri conturi) throws JSONException, IOException {
@@ -341,5 +372,49 @@ public class Utilities {
         pngw.end();
         fos.flush();
         fos.close();
+    }
+
+    public static void generateChatGPT(String messages, Function<String, Void> func, Runnable atEnd){
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            try {
+                String apiKey = values.API_KEY;
+                String model = "gpt-3.5-turbo";
+                URL obj = new URL("https://api.proxyapi.ru/openai/v1/chat/completions");
+                HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Authorization", "Bearer " + apiKey);
+                connection.setRequestProperty("Content-Type", "application/json");
+
+                // The request body
+                String body = "{\"model\": \"" + model + "\", \"messages\": ["+messages+"],\"stream\":true}";
+                connection.setDoOutput(true);
+                OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
+                writer.write(body);
+                writer.flush();
+                writer.close();
+                BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                String line;
+
+                while ((line = br.readLine()) != null) {
+                    if (line.isEmpty()) continue;
+                    int start = line.indexOf("content")+ 10;
+
+                    int end = line.indexOf("\"", start);
+                    String finresponse;
+                    if(start==9||end==-1){
+                        finresponse = "";
+                    }else {
+                        finresponse = line.substring(start, end);
+                    }
+                    String finalFinresponse = finresponse;
+                    func.apply(finalFinresponse);
+                }
+                br.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        if(atEnd!=null) atEnd.run();
     }
 }
